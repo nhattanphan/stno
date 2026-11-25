@@ -127,11 +127,58 @@ dl.info dt{color:var(--muted);font-weight:600}dl.info dd{margin:0;min-width:0;ov
 .help h3{font:700 16px var(--display);margin:0 0 8px}
 .help ol{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14.5px}
 
-.ovtop{display:grid;gap:16px;grid-template-columns:minmax(0,1fr) 380px;align-items:start}
-.ovtop .pgrid{grid-template-columns:repeat(auto-fill,minmax(min(100%,400px),1fr))}
-.chatp{position:sticky;top:76px;margin-top:29px;height:min(calc(100vh - 100px),678px);grid-template-rows:auto 1fr auto}
-.chatp .llist{max-height:none;min-height:240px}
-@media (max-width:1100px){.ovtop{grid-template-columns:1fr}.chatp{position:static;margin-top:0;height:auto}.chatp .llist{max-height:360px}}
+/* samples & die maps */
+:root{--skip:#e3e6ef}
+.dgrid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr))}
+.dcard{gap:12px}
+.dlink{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;align-items:center;text-decoration:none;color:inherit}
+.dlink:hover h3{color:var(--accent)}
+.minibox{width:120px;height:120px;display:grid;place-items:center;background:var(--raised);border:1px solid var(--line);border-radius:10px;padding:8px}
+.minibox svg{width:100%;height:100%}
+.dtxt{min-width:0;display:grid;gap:4px}
+.dtxt h3{padding-right:0}.dtxt .row{padding-right:58px}
+.dhead{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-start}
+.dtitle{font:800 24px/1.15 var(--display)!important;text-transform:none!important;color:var(--ink)!important;letter-spacing:-.005em!important;margin:2px 0!important}
+.dwrap{display:grid;gap:18px;grid-template-columns:minmax(0,1fr) 360px;align-items:start}
+@media (max-width:900px){.dwrap{grid-template-columns:minmax(0,1fr)}}
+.dmain{display:grid;gap:12px;min-width:0}
+.dside{position:sticky;top:76px;min-width:0}
+@media (max-width:900px){.dside{position:static}}
+.dleg{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.lchip{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:4px 11px}
+.lchip b{width:10px;height:10px;border-radius:3px;display:inline-block}
+.lf{display:inline-flex;align-items:center;gap:6px;margin-left:6px}
+.fdot{width:8px;height:8px;border-radius:50%;background:#fff;border:2px solid var(--ink);display:inline-block}
+.dscroll{overflow:auto;max-height:78vh;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;box-shadow:var(--shadow)}
+.dmap{display:grid;gap:4px;width:max-content;min-width:100%}
+.dmap.hasub{gap:6px}
+.dch,.drh{font:600 12px var(--mono);color:var(--muted);display:grid;place-items:center;text-align:center;line-height:1.15}
+.dch small,.drh small{font:500 10px var(--body);color:var(--faint)}
+.drh{padding-right:4px}
+.dch{position:sticky;top:-10px;background:var(--surface);z-index:1;padding:2px 0}
+.dcell{display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:3px;background:var(--raised);border:1px solid var(--line);border-radius:7px}
+.dnone{display:block;min-height:18px;border-radius:4px;background:repeating-linear-gradient(45deg,transparent 0 3px,#eef0f6 3px 5px)}
+.dmap:not(.hasub)>.dnone{min-height:28px}
+.dv{position:relative;border:0;border-radius:5px;background:var(--c);min-height:28px;min-width:0;cursor:pointer;padding:0;font:600 11px var(--mono);color:#fff;transition:transform .08s}
+.hasub .dv{min-height:20px;border-radius:4px}
+.dv:hover{transform:scale(1.12);z-index:2;box-shadow:0 2px 8px rgba(20,26,51,.3)}
+.dv.on{outline:3px solid var(--ink);outline-offset:1px;z-index:2}
+.dv.dim{opacity:.18}
+.dv.hasf::after{content:"";position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px var(--ink)}
+.hasub .dv.hasf::after{width:6px;height:6px;top:2px;right:2px}
+.dv[style*="--idle"],.dv[style*="--skip"]{color:var(--ink)}
+.dlist{display:flex;flex-wrap:wrap;gap:8px}
+.dv.big{min-height:40px;padding:6px 12px}
+.dpanel{gap:12px}
+.spill{display:inline-flex;align-items:center;gap:6px;font:700 13px var(--body);padding:4px 12px;border-radius:999px;background:color-mix(in srgb,var(--c) 18%,#fff);color:var(--ink);border:1px solid var(--c)}
+.spill::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c)}
+.dnote{margin:0;background:var(--raised);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:8px 12px;font-size:14.5px}
+.ffold{display:grid;gap:3px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--raised);margin-bottom:6px}
+.ffold>a{text-decoration:none}.ffold>a b{font-weight:600}
+.fslide{font-size:13px;overflow-wrap:anywhere}
+.dform{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.dfl{display:grid;gap:4px;font:600 13px var(--body)}
+
 /* toolbars */
 .tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .chip{border:1px solid var(--line);background:var(--raised);color:var(--ink);border-radius:999px;padding:6px 13px;min-height:36px;font:500 13.5px var(--body);cursor:pointer}
@@ -210,7 +257,6 @@ footer.site{padding-block:0 32px;color:var(--muted);font-size:13.5px}
   <nav class="tabs" aria-label="Sections">
     <a class="tab" href="#overview" data-v="overview">Overview</a>
     <a class="tab" href="#samples" data-v="samples">Samples<span class="n" id="nS"></span></a>
-    <a class="tab" href="#measurements" data-v="measurements"><span class="lg">Measurements</span><span class="sm">Data</span><span class="n" id="nR"></span></a>
     <a class="tab" href="#meetings" data-v="meetings">Meetings<span class="n" id="nM"></span></a>
     <a class="tab" href="#talks" data-v="talks">Talks<span class="n" id="nT"></span></a>
     <a class="tab" href="#learn" data-v="learn">Learn</a>
@@ -244,7 +290,7 @@ const today=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOStr
 const byDate=(a,b)=>String(b.date||"").localeCompare(String(a.date||""));
 function fmtD(s,noYear){const [y,m,d]=String(s||"").split("-");if(!m)return esc(s||"");return (+d?+d+" ":"")+MON[+m-1]+(noYear&&y==String(new Date().getFullYear())?"":" "+y)}
 function toast(t){const e=document.createElement("div");e.className="toast";e.setAttribute("role","status");e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2600)}
-function view(){const v=(location.hash||"#overview").slice(1).replace(/-.*/,"");return ["overview","samples","measurements","meetings","talks","learn","papers","files"].includes(v)?v:"overview"}
+function view(){const v=(location.hash||"#overview").slice(1).replace(/-.*/,"");return ["overview","samples","die","meetings","talks","learn","papers","files"].includes(v)?v:"overview"}
 function drive(k){return (S.config&&S.config[k])||""}
 function myName(){try{return localStorage.getItem("lafhub_name")||""}catch(e){return ""}}
 function setName(n){if(n)try{localStorage.setItem("lafhub_name",n)}catch(e){}}
@@ -264,13 +310,13 @@ function merge(){if(!S.base)return;
 
 /* ---------- render ---------- */
 function render(){
-  const v=view();document.querySelectorAll(".tab").forEach(t=>{if(t.dataset.v===v)t.setAttribute("aria-current","page");else t.removeAttribute("aria-current")});
-  $("#nS").textContent=S.samples.length||"";$("#nR").textContent=S.runs.length||"";$("#nM").textContent=S.meetings.length||"";$("#nT").textContent=S.talks.length||"";$("#nP").textContent=S.refs.length||"";
+  const v=view();document.querySelectorAll(".tab").forEach(t=>{if(t.dataset.v===(v==="die"?"samples":v))t.setAttribute("aria-current","page");else t.removeAttribute("aria-current")});
+  $("#nS").textContent=S.samples.length||"";$("#nM").textContent=S.meetings.length||"";$("#nT").textContent=S.talks.length||"";$("#nP").textContent=S.refs.length||"";
   const ch=$("#chatLink");if(drive("chat"))ch.href=drive("chat");const r=$("#driveRoot");if(drive("root")){r.href=drive("root");r.hidden=false}else r.hidden=true;
   const el=$("#view");if(!S.base){el.innerHTML=`<div class="empty">Loading…</div>`;return}
-  const keep={};["chatIn","chatName"].forEach(id=>{const e=document.getElementById(id);if(e)keep[id]=e.value});
+  const keep={};["chatIn","chatName","dvNote","dvSt"].forEach(id=>{const e=document.getElementById(id);if(e)keep[id]=e.value});
   const ae=document.activeElement&&el.contains(document.activeElement)&&document.activeElement.id,sel=ae&&document.activeElement.selectionStart;
-  el.innerHTML=({overview:vOverview,samples:vSamples,measurements:vRuns,meetings:vMeetings,talks:vTalks,learn:vLearn,papers:vPapers,files:vFiles})[v]();
+  el.innerHTML=({overview:vOverview,samples:vSamples,die:vDie,meetings:vMeetings,talks:vTalks,learn:vLearn,papers:vPapers,files:vFiles})[v]();
   if(MOD&&(v==="learn"||v==="papers"))try{MOD.mount(el)}catch(x){}
   for(const[id,val] of Object.entries(keep)){const e=document.getElementById(id);if(e)e.value=val}
   if(ae){const e=document.getElementById(ae);if(e){e.focus();try{if(sel!=null)e.setSelectionRange(sel,sel)}catch(x){}}}
@@ -281,41 +327,105 @@ function vOverview(){
   const alive=S.samples.reduce((n,s)=>n+((s.counts||{}).alive||0),0),tot=S.samples.reduce((n,s)=>n+(s.total||0),0);
   const R=[...S.runs].sort(byDate),M=[...S.meetings].sort(byDate),T=[...S.talks].sort(byDate);
   const tile=(href,k,v,d)=>`<a class="tile" href="${href}"><span class="k">${k}</span><span class="v">${v}</span><span class="d">${d}</span></a>`;
-  const act=[...R.map(r=>({d:r.date,c:"--accent",k:"Measurement",t:r.device,s:[PJ[r.project],r.params].filter(Boolean).join(" · "),u:r.file,h:"#measurements"})),
+  const act=[...R.map(r=>({d:r.date,c:"--accent",k:"Measurement",t:r.device,s:[PJ[r.project],r.params].filter(Boolean).join(" · "),u:r.file,h:"#samples"})),
     ...M.map(m=>({d:m.date,c:"--navy",k:"Meeting",t:m.title,s:m.who||"",u:m.slides,h:"#meetings"})),
     ...T.map(t=>({d:t.date,c:"--vio",k:(TK[t.kind]||[t.kind])[0],t:t.title,s:t.conf,u:t.files,h:"#talks"}))].sort((a,b)=>String(b.d).localeCompare(String(a.d))).slice(0,7);
-  return `<section class="ovtop">
-   <div id="overview-projects"><div class="shead"><h2>Projects</h2></div><div class="grid pgrid">${P.map(projCard).join("")}</div></div>
-   <aside class="panel chatp" aria-labelledby="hChat"><div class="row" style="justify-content:space-between"><h3 id="hChat">Chat</h3><span class="row"><span class="live" id="liveSt"><i></i><span>connecting…</span></span>${link(drive("chat"),"Tchap ↗")}</span></div>
-    <div id="chatList" class="llist chat" role="log" aria-label="Chat messages"></div>
-    <form id="chatForm" class="lform"><input id="chatName" class="cname" maxlength="30" placeholder="Name" aria-label="Your name"><input id="chatIn" maxlength="1000" placeholder="Message…" autocomplete="off" aria-label="Message"><button class="btn primary" type="submit">Send</button></form></aside>
-  </section>
+  return `<section id="overview-projects"><div class="shead"><h2>Projects</h2></div><div class="grid pgrid">${P.map(projCard).join("")}</div></section>
   <section><div class="shead"><h2>Recent activity</h2></div>
    ${act.length?`<ol class="feed">${act.map(a=>`<li><time>${fmtD(a.d,1)}</time><span class="dot" style="--c:var(${a.c})" aria-hidden="true"></span><div><div class="t"><a href="${a.h}">${esc(a.k)} · ${esc(a.t)}</a></div>${a.s?`<div class="s">${esc(a.s)}</div>`:""}</div>${a.u&&/^https?:/.test(a.u)?`<a class="btn sm" href="${esc(a.u)}" target="_blank" rel="noopener">Open ↗</a>`:"<span></span>"}</li>`).join("")}</ol>`:`<div class="empty">Nothing logged yet.</div>`}</section>
   <section class="help"><h3>How to use this hub</h3><ol>
-   <li><b>Chat</b> in the box at the top right; everyone sees the message immediately.</li>
-   <li><b>Add things</b> with the <b>＋</b> button on each tab (a measurement, a meeting, a talk, a sample) and fix any card with <b>✎ Edit</b>.</li>
+   <li><b>Samples:</b> open a die to see its layout; click any device for its status and its measurement files on sDrive.</li>
+   <li><b>Add things</b> with the <b>＋</b> button on each tab (a meeting, a talk, a paper) and fix any card with <b>✎ Edit</b>; device status is changed from the die map.</li>
    <li><b>Files stay on sDrive.</b> Upload slides or data there, then paste the link (on sDrive: ⋯ next to the file › <i>Copy internal link</i>).</li>
   </ol></section>`}
 
-function projCard(p){const n=S.runs.filter(r=>r.project===p.key).length,sm=S.samples.filter(s=>s.project===p.key).length;
-  return `<article class="card">${editBtn("projects",p._id,p.name)}<div class="row"><span class="pill">${esc(p.stage)}</span><span class="note">${n} measurement${n===1?"":"s"} · ${sm} sample${sm===1?"":"s"}</span></div>
+function projCard(p){const sm=S.samples.filter(s=>s.project===p.key).length;
+  return `<article class="card">${editBtn("projects",p._id,p.name)}<div class="row"><span class="pill">${esc(p.stage)}</span><span class="note">${sm} sample${sm===1?"":"s"}</span></div>
   <h3>${esc(p.name)}</h3><div class="sub">${esc(p.title)}</div><p>${esc(p.summary)}</p>
   ${p.facts&&p.facts.length?`<details><summary>Setup notes</summary><ul class="facts">${p.facts.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>`:""}
   ${p.overleaf?`<a class="btn" style="justify-self:start" href="${esc(p.overleaf)}" target="_blank" rel="noopener">✍️ Paper draft on Overleaf ↗</a>`:""}
-  <div class="links">${link(p.drive,"sDrive data ↗")}${p.paper?link(p.paper,"Paper folder ↗"):""}<a href="#samples" data-go="sf" data-val="${esc(p.key)}">Samples</a><a href="#measurements" data-go="pf" data-val="${esc(p.key)}">Measurements</a></div></article>`}
+  <div class="links">${link(p.drive,"sDrive data ↗")}${p.paper?link(p.paper,"Paper folder ↗"):""}<a href="#samples" data-go="sf" data-val="${esc(p.key)}">Samples & devices</a></div></article>`}
 
 function bar(c,t){const parts=STC.map(([k,,v])=>[k,c[k]||0,v]).filter(x=>x[1]);if(!parts.length)return "";
   return `<div class="bar" role="img" aria-label="${parts.map(([k,n])=>n+" "+k).join(", ")}">${parts.map(([k,n,v])=>`<i style="width:${n/t*100}%;background:var(${v})"></i>`).join("")}</div>
   <div class="legend">${parts.map(([k,n,v])=>`<span><b style="background:var(${v})"></b>${n} ${esc(STC.find(x=>x[0]===k)[1].toLowerCase())}</span>`).join("")}</div>`}
+/* ---------- Samples: die maps & devices ---------- */
+let DEV=null;
+const STL={alive:"Alive",untested:"Untested",suspect:"Suspect",dead:"Dead",measdead:"Died in measurement",short:"Short",open:"Open",skip:"Not used (C-state)"};
+const STV={alive:"--ok",untested:"--idle",suspect:"--warn",dead:"--bad",measdead:"--bad2",short:"--vio",open:"--vio",skip:"--skip"};
+async function loadDev(){try{const x=await fetch("devices.enc.json",{cache:"no-store"}).then(r=>r.json());DEV=await decB(CR.k,x);render()}catch(e){DEV={maps:{},files:{},err:1};render()}}
+function devGet(sid,name){const m=DEV&&DEV.maps[sid];if(!m)return null;const b=m.dev[name];const it=LV.items["dev__"+sid+"__"+name];
+  if(!it||it.del)return b;return {...(b||{}),...it.item,_by:it.by,_t:it.t}}
+function devNames(sid){const m=DEV&&DEV.maps[sid];if(!m)return [];const n=new Set(Object.keys(m.dev));for(const k of Object.keys(LV.items))if(k.startsWith("dev__"+sid+"__"))n.add(k.slice(7+sid.length));return [...n]}
+function devCounts(sid){const c={};let t=0;for(const n of devNames(sid)){const d=devGet(sid,n);if(!d||d.st==="skip")continue;c[d.st||"untested"]=(c[d.st||"untested"]||0)+1;t++}return {c,t}}
+function devFiles(sid,name){return ((DEV&&DEV.files[sid])||{})[name]||[]}
+function sampleCounts(s){if(DEV&&DEV.maps[s._id]&&!DEV.maps[s._id].list){const {c,t}=devCounts(s._id);return {c,t}}return {c:s.counts||{},t:s.total||0}}
+/* layout geometry shared by the mini and the full map */
+function geo(m){let rows=m.rows,cols=m.cols,tr=false;if(rows.length>20&&rows.length>2*cols.length){tr=true;[rows,cols]=[cols,rows]}
+  const sub=m.sub&&m.sub.length?m.sub:null;return {rows,cols,tr,sub}}
+function cellOf(m,g,r,c){// devices at visual row r / col c
+  const out={};for(const [n,d] of Object.entries(m.dev)){if(d.extra)continue;const rr=g.tr?d.col:d.row,cc=g.tr?d.row:d.col;if(String(rr)===String(r)&&String(cc)===String(c))out[d.sub||"_"]=n}return out}
+function miniMap(sid){const m=DEV&&DEV.maps[sid];if(!m||m.list)return "";const g=geo(m),u=g.sub?3.2:7,gap=g.sub?2:1,cw=g.sub?2*u+1:u;
+  let x0=0,y0=0,out="";g.rows.forEach((r,ri)=>g.cols.forEach((c,ci)=>{const cell=cellOf(m,g,r,c),X=ci*(cw+gap),Y=ri*(cw+gap);
+    if(g.sub){g.sub.forEach((j,k)=>{const n=cell[j];if(!n)return;const d=devGet(sid,n);out+=`<rect x="${X+(k%2)*(u+1)}" y="${Y+Math.floor(k/2)*(u+1)}" width="${u}" height="${u}" fill="var(${STV[d.st]||"--idle"})"/>`})}
+    else{const n=cell._;if(!n)return;const d=devGet(sid,n);out+=`<rect x="${X}" y="${Y}" width="${cw}" height="${cw}" rx="1" fill="var(${STV[d.st]||"--idle"})"/>`}}));
+  const W=g.cols.length*(cw+gap),Hh=g.rows.length*(cw+gap);return `<svg class="mini" viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${out}</svg>`}
+function sbar(c,t){return bar(c,t||1)}
 function vSamples(){
   const L=S.samples.filter(s=>S.sf==="all"||s.project===S.sf).sort((a,b)=>(a.order||99)-(b.order||99));
-  return `<section class="ptitle"><div><h2>Samples<span class="cn">${S.samples.length}</span></h2><p>One card per die. After a session, update the device counts with ✎ Edit.</p></div>${addBtn("samples","Add a sample")}</section>
+  return `<section class="ptitle"><div><h2>Samples<span class="cn">${S.samples.length}</span></h2><p>One card per die. Open a die to see its layout; click a device for its status and its measurement files on sDrive.</p></div>${addBtn("samples","Add a sample")}</section>
   <div class="tools">${pjChips("sf")}</div>
-  ${L.length?`<div class="grid">${L.map(s=>`<article class="card">${editBtn("samples",s._id,s.name)}<div class="row"><span class="pj">${esc(PJ[s.project]||s.project)}</span><span class="note">${s.total?s.total+" devices":"no device map yet"}</span></div>
-  <h3>${esc(s.name)}</h3>${s.subtitle?`<div class="sub">${esc(s.subtitle)}</div>`:""}${bar(s.counts||{},s.total||1)}
-  ${(s.info||[]).length?`<details><summary>Details</summary><dl class="info">${s.info.map(i=>`<dt>${esc(i.k)}</dt><dd>${esc(i.v)}</dd>`).join("")}</dl></details>`:""}
-  <div class="links">${link(s.layout,"Layout ↗")}${link(s.drive,"Sample info ↗")}${link(s.data,"Measurement data ↗")}</div></article>`).join("")}</div>`:`<div class="empty">No samples for this project.</div>`}`}
+  ${L.length?`<div class="dgrid">${L.map(s=>{const {c,t}=sampleCounts(s);const has=DEV&&DEV.maps[s._id];const nf=Object.keys((DEV&&DEV.files[s._id])||{}).length;
+   return `<article class="card dcard">${editBtn("samples",s._id,s.name)}<a class="dlink" href="#die-${esc(s._id)}" aria-label="Open ${esc(s.name)}">
+   <div class="minibox">${has&&!has.list?miniMap(s._id):`<span class="note">${DEV?"no layout":"loading…"}</span>`}</div>
+   <div class="dtxt"><div class="row"><span class="pj">${esc(PJ[s.project]||s.project)}</span><span class="note">${t?t+" devices":"no device map"}${nf?` · ${nf} with data`:""}</span></div>
+   <h3>${esc(s.name)}</h3>${s.subtitle?`<div class="sub">${esc(s.subtitle)}</div>`:""}</div></a>${sbar(c,t)}</article>`}).join("")}</div>`:`<div class="empty">No samples for this project.</div>`}`}
+
+function vDie(){const sid=(location.hash.match(/^#die-(.+)$/)||[])[1];const s=S.samples.find(x=>x._id===sid);
+  if(!s)return `<div class="empty">Sample not found. <a href="#samples">Back to samples</a></div>`;
+  if(!DEV)return `<div class="empty">Loading the die map…</div>`;
+  const m=DEV.maps[sid];const {c,t}=sampleCounts(s);const sel=S.dsel&&S.dsel[0]===sid?S.dsel[1]:null;const hl=S.dhl||"";
+  const head=`<div class="dhead"><a class="btn ghost sm" href="#samples">← All samples</a><div><div class="row"><span class="pj">${esc(PJ[s.project]||s.project)}</span><span class="note">${t} devices</span></div><h2 class="dtitle">${esc(s.name)}</h2>${s.subtitle?`<div class="note">${esc(s.subtitle)}</div>`:""}</div></div>`;
+  const leg=`<div class="dleg" role="group" aria-label="Highlight devices by status">${Object.entries(STL).filter(([k])=>k==="skip"?Object.values((m||{}).dev||{}).some(d=>d.st==="skip"):c[k]).map(([k,l])=>`<button type="button" class="chip lchip" data-hl="${k}" aria-pressed="${hl===k}"><b style="background:var(${STV[k]})"></b>${esc(l)}${k!=="skip"?` <span class="cn">${c[k]||0}</span>`:""}</button>`).join("")}<span class="note lf"><i class="fdot"></i> has files on sDrive</span></div>`;
+  let mapHTML="";
+  if(!m||m.list){const names=devNames(sid);mapHTML=`<div class="dlist">${names.length?names.map(n=>devBtn(sid,n,sel,hl,1)).join(""):`<div class="empty">No device list for this sample yet.</div>`}</div>`}
+  else{const g=geo(m);const cw=g.sub?0:(g.cols.length>12?30:38);
+    mapHTML=`<div class="dscroll"><div class="dmap${g.sub?" hasub":""}" style="grid-template-columns:auto repeat(${g.cols.length},${g.sub?"minmax(44px,1fr)":cw+"px"})">
+     <div class="dcorner">${g.tr?"":""}</div>${g.cols.map(cn=>{const info=g.tr?((m.rowInfo||{})[cn]||""):((m.colInfo||{})[cn]||"");return `<div class="dch">${esc(cn)}${info?`<small>${esc(info)}</small>`:""}</div>`}).join("")}
+     ${g.rows.map(r=>{const ri=g.tr?((m.colInfo||{})[r]||""):((m.rowInfo||{})[r]||"");return `<div class="drh">${esc(r)}${ri?`<small>${esc(ri)}</small>`:""}</div>`+g.cols.map(cc=>{const cell=cellOf(m,g,r,cc);
+       if(g.sub)return `<div class="dcell">${g.sub.map(j=>cell[j]?devBtn(sid,cell[j],sel,hl):`<span class="dnone"></span>`).join("")}</div>`;
+       return cell._?devBtn(sid,cell._,sel,hl):`<span class="dnone"></span>`}).join("")}).join("")}</div></div>
+     <p class="note">${m.colUnit?`Column header: ${esc(m.colUnit)}. `:""}${g.tr?"Map shown rotated (series as rows) to fit the screen. ":""}${g.sub?"Each cell holds junctions J1 J2 / J3 J4. ":""}Files indexed from sDrive on ${esc(fmtD(DEV.scanned))}.</p>`}
+  return `${head}<div class="dwrap"><section class="dmain">${sbar(c,t)}${leg}${mapHTML}</section><aside class="dside" id="dside">${sel?devPanel(sid,sel):samplePanel(s)}</aside></div>`}
+function devBtn(sid,n,sel,hl,big){const d=devGet(sid,n)||{st:"untested"};const f=devFiles(sid,n).length;const st=d.st||"untested";
+  return `<button type="button" class="dv${big?" big":""}${sel===n?" on":""}${hl&&hl!==st?" dim":""}${f?" hasf":""}" style="--c:var(${STV[st]||"--idle"})" data-dev="${esc(n)}" title="${esc(n+" · "+(STL[st]||st))}" aria-label="${esc(n+", "+(STL[st]||st)+(f?", has files":""))}">${big?esc(n):""}</button>`}
+function samplePanel(s){return `<div class="panel"><h3>About this die</h3><p class="note" style="margin:0">Click a device on the map to see its status, its measurement folders and slides on sDrive, and to update it.</p>
+  <div class="links">${link(s.layout,"Layout ↗")}${link(s.drive,"Sample info ↗")}${link(s.data,"Measurement data ↗")}</div>
+  ${(s.info||[]).length?`<dl class="info">${s.info.map(i=>`<dt>${esc(i.k)}</dt><dd>${esc(i.v)}</dd>`).join("")}</dl>`:""}</div>`}
+function devPanel(sid,n){const d=devGet(sid,n)||{st:"untested"};const st=d.st||"untested";const F=devFiles(sid,n);const m=DEV.maps[sid]||{};
+  const facts=[["Position",[d.row&&"row "+d.row,d.col&&"column "+d.col,d.sub].filter(Boolean).join(" · ")],["Ø",d.d?d.d+" nm":(m.colInfo&&m.colInfo[d.col]&&/Ø/.test(m.colUnit||"")?m.colInfo[d.col]+" nm":"")],
+   ["TMR",d.tmr!=null?d.tmr+" %":""],["R_min",d.rmin!=null?d.rmin+" Ω":""],["R–H class",d.cls2||""],["θ0",d.th!=null?d.th+"°":""],["μ0M_eff",d.meff!=null?d.meff+" mT":""],
+   ["Configuration",[d.cfg,d.n&&d.n+" pillar"+(d.n>1?"s":"")].filter(Boolean).join(" · ")],["Spacing",d.sp?d.sp+" nm":""],["Priority",d.pri||""]].filter(x=>x[1]);
+  const typ=([dd,ss,ii])=>[dd&&dd+" data",ss&&ss+" slides",ii&&ii+" images"].filter(Boolean).join(" · ")||"empty folder";
+  return `<div class="panel dpanel"><div class="row" style="justify-content:space-between"><h3>${esc(n)}</h3><button type="button" class="btn ghost sm" data-dclose aria-label="Close device">✕</button></div>
+  <div><span class="spill" style="--c:var(${STV[st]||"--idle"})">${esc(STL[st]||st)}</span>${d._by?` <span class="note">updated by ${esc(d._by)}${d._t?" · "+esc(ago(d._t)):""}</span>`:""}</div>
+  ${d.note?`<p class="dnote">${esc(d.note)}</p>`:""}
+  ${facts.length?`<dl class="info">${facts.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>`:""}
+  <div><div class="lbl" style="margin-bottom:6px">On sDrive</div>${F.length?F.map(f=>`<div class="ffold"><a href="https://sdrive.cnrs.fr/f/${f.id}" target="_blank" rel="noopener"><b>${f.file?"📊":"📁"} ${esc(f.n)} ↗</b></a><span class="note">${f.file?"slides":typ(f.c)}</span>
+    ${(f.sl||[]).filter(x=>!f.file).map(([nm,id])=>`<a class="fslide" href="https://sdrive.cnrs.fr/f/${id}" target="_blank" rel="noopener">📊 ${esc(nm)}</a>`).join("")}</div>`).join(""):`<p class="note" style="margin:0">No measurement folder for this device (index of ${esc(fmtD(DEV.scanned))}). Name the folder after the device, e.g. <span class="mono">${esc(n)}</span>.</p>`}</div>
+  <form class="dform" id="devForm" data-sid="${esc(sid)}" data-n="${esc(n)}"><div class="lbl">Update</div>
+   <label class="dfl">Status<select id="dvSt">${Object.entries(STL).map(([k,l])=>`<option value="${k}"${k===st?" selected":""}>${esc(l)}</option>`).join("")}</select></label>
+   <label class="dfl">Note<textarea id="dvNote" rows="2" placeholder="e.g. R–H OK, died at 5 mA">${esc(d.note||"")}</textarea></label>
+   ${myName()?"":`<label class="dfl">Your name<input id="dvName" maxlength="30" required></label>`}
+   <button class="btn primary" type="submit">Save</button></form></div>`}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-dev]");if(b){const sid=(location.hash.match(/^#die-(.+)$/)||[])[1];S.dsel=[sid,b.dataset.dev];render();
+    const sd=$("#dside");if(sd&&window.innerWidth<900)sd.scrollIntoView({behavior:"smooth",block:"start"});return}
+  if(e.target.closest("[data-dclose]")){S.dsel=null;render();return}
+  const h=e.target.closest("[data-hl]");if(h){S.dhl=S.dhl===h.dataset.hl?"":h.dataset.hl;render()}});
+document.addEventListener("submit",async e=>{if(e.target.id!=="devForm")return;e.preventDefault();const f=e.target,sid=f.dataset.sid,n=f.dataset.n;const nm=$("#dvName");if(nm){if(!nm.value.trim()){nm.focus();return}setName(nm.value.trim())}
+  const b=f.querySelector("button[type=submit]");b.disabled=true;b.textContent="Saving…";
+  const ok=await saveItem("dev",sid+"__"+n,{coll:"dev",id:sid+"__"+n,item:{st:$("#dvSt").value,note:$("#dvNote").value.trim()},by:myName()});
+  if(ok)toast("Saved "+n);b.disabled=false;b.textContent="Save"});
 
 function runRow(r){return `<div class="entry"><div class="d">${fmtD(r.date)}</div><div class="main">${editBtn("runs",r._id,r.device)}<div class="row"><span class="dev">${esc(r.device)}</span><span class="pj">${esc(PJ[r.project]||r.project)}</span></div>
   ${r.params?`<div>${esc(r.params)}</div>`:""}${r.result?`<div><span class="lbl">Result</span> ${esc(r.result)}</div>`:""}${r.notes?`<div class="meta">${esc(r.notes)}</div>`:""}
@@ -433,7 +543,7 @@ document.addEventListener("click",e=>{const c=e.target.closest("[data-f]");if(c)
   const g=e.target.closest("[data-go]");if(g)S[g.dataset.go]=g.dataset.val;
   if(e.target.id==="lockBtn"){e.preventDefault();lockOut()}});
 document.addEventListener("input",e=>{if(e.target.id==="rq"){S.rq=e.target.value;render()}if(e.target.id==="q"){S.q=e.target.value;render()}if(e.target.id==="mq"){S.mq=e.target.value;render()}});
-let lastV=view();window.addEventListener("hashchange",()=>{const v=view();render();if(v!==lastV&&!location.hash.includes("-"))window.scrollTo(0,0);lastV=v;if(location.hash.includes("-")){const t=document.getElementById(location.hash.slice(1));if(t)t.scrollIntoView()}});
+let lastV=view();window.addEventListener("hashchange",()=>{const v=view();render();if(v!==lastV&&!/^#(learn|papers|overview)-/.test(location.hash))window.scrollTo(0,0);lastV=v;if(/^#(learn|papers|overview)-/.test(location.hash)){const t=document.getElementById(location.hash.slice(1));if(t)t.scrollIntoView()}});
 
 /* ---------- live layer (Firebase) ---------- */
 const FBC={apiKey:"AIzaSyClJTC7j-8gbVQKinCOG7QFz-ypVLacRMQ",authDomain:"laf-stno-hub.firebaseapp.com",projectId:"laf-stno-hub",storageBucket:"laf-stno-hub.firebasestorage.app",messagingSenderId:"529030906481",appId:"1:529030906481:web:9b460db7a6474a413851d0"};
@@ -471,7 +581,7 @@ async function unlock(pw,remember){const k=await deriveKey(pw,ENC.kdf.salt,ENC.k
   for(const x of ENC.extra||[]){try{const m=await decB(k,x);d.meetings=(d.meetings||[]).filter(y=>y._id!==m._id).concat([m])}catch(e){}}
   CR.k=k;if(remember){try{localStorage.setItem("lafhub_pw",pw)}catch(e){}}
   S.base={projects:d.projects||[],samples:d.samples||[],runs:d.runs||[],meetings:d.meetings||[],talks:d.talks||[],refs:[]};S.config=d.config||{};merge();
-  document.body.classList.remove("locked");const L=$("#lock");if(L)L.remove();render();startLive(pw);loadLearn()}
+  document.body.classList.remove("locked");const L=$("#lock");if(L)L.remove();render();startLive(pw);loadLearn();loadDev()}
 function lockScreen(){document.body.classList.add("locked");const L=document.createElement("div");L.id="lock";L.innerHTML=`<form class="lbox" id="lf"><div class="lt">LAF STNO <span>Hub</span></div><p class="note" style="margin:0">This page is private. Enter the password.</p>
   <input type="password" id="lpw" autocomplete="current-password" placeholder="Password" aria-label="Password" required><label class="note lrem"><input type="checkbox" id="lrm" checked> Remember on this device</label>
   <button class="btn primary" type="submit">Open</button><div class="lerr" id="lerr" role="alert"></div></form>`;document.body.appendChild(L);
