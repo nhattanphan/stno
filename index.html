@@ -127,6 +127,11 @@ dl.info dt{color:var(--muted);font-weight:600}dl.info dd{margin:0;min-width:0;ov
 .help h3{font:700 16px var(--display);margin:0 0 8px}
 .help ol{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14.5px}
 
+.ovtop{display:grid;gap:16px;grid-template-columns:minmax(0,1fr) 380px;align-items:start}
+.ovtop .pgrid{grid-template-columns:repeat(auto-fill,minmax(min(100%,400px),1fr))}
+.chatp{position:sticky;top:76px;margin-top:29px;height:min(calc(100vh - 100px),678px);grid-template-rows:auto 1fr auto}
+.chatp .llist{max-height:none;min-height:240px}
+@media (max-width:1100px){.ovtop{grid-template-columns:1fr}.chatp{position:static;margin-top:0;height:auto}.chatp .llist{max-height:360px}}
 /* toolbars */
 .tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .chip{border:1px solid var(--line);background:var(--raised);color:var(--ink);border-radius:999px;padding:6px 13px;min-height:36px;font:500 13.5px var(--body);cursor:pointer}
@@ -261,7 +266,7 @@ function render(){
   $("#nS").textContent=S.samples.length||"";$("#nR").textContent=S.runs.length||"";$("#nM").textContent=S.meetings.length||"";$("#nT").textContent=S.talks.length||"";
   const ch=$("#chatLink");if(drive("chat"))ch.href=drive("chat");const r=$("#driveRoot");if(drive("root")){r.href=drive("root");r.hidden=false}else r.hidden=true;
   const el=$("#view");if(!S.base){el.innerHTML=`<div class="empty">Loading…</div>`;return}
-  const keep={};["updIn","chatIn","chatName"].forEach(id=>{const e=document.getElementById(id);if(e)keep[id]=e.value});
+  const keep={};["chatIn","chatName"].forEach(id=>{const e=document.getElementById(id);if(e)keep[id]=e.value});
   const ae=document.activeElement&&el.contains(document.activeElement)&&document.activeElement.id,sel=ae&&document.activeElement.selectionStart;
   el.innerHTML=({overview:vOverview,samples:vSamples,measurements:vRuns,meetings:vMeetings,talks:vTalks,files:vFiles})[v]();
   for(const[id,val] of Object.entries(keep)){const e=document.getElementById(id);if(e)e.value=val}
@@ -276,25 +281,16 @@ function vOverview(){
   const act=[...R.map(r=>({d:r.date,c:"--accent",k:"Measurement",t:r.device,s:[PJ[r.project],r.params].filter(Boolean).join(" · "),u:r.file,h:"#measurements"})),
     ...M.map(m=>({d:m.date,c:"--navy",k:"Meeting",t:m.title,s:m.who||"",u:m.slides,h:"#meetings"})),
     ...T.map(t=>({d:t.date,c:"--vio",k:(TK[t.kind]||[t.kind])[0],t:t.title,s:t.conf,u:t.files,h:"#talks"}))].sort((a,b)=>String(b.d).localeCompare(String(a.d))).slice(0,7);
-  return `<section aria-label="At a glance"><div class="tiles">
-    ${tile("#overview-projects","Projects",P.length,esc(P.map(p=>p.stage).filter(Boolean).slice(0,2).join(" · ")))}
-    ${tile("#samples","Devices alive",`${alive}<small>/ ${tot}</small>`,`across ${S.samples.length} samples`)}
-    ${tile("#measurements","Measurements",R.length,R[0]?"latest "+fmtD(R[0].date,1):"none yet")}
-    ${tile("#meetings","Last meeting",M[0]?fmtD(M[0].date,1):"—",M[0]?esc(M[0].title):"")}
-  </div></section>
-  <section class="two">
-   <div class="panel" aria-labelledby="hUpd"><div class="row" style="justify-content:space-between"><h3 id="hUpd">Latest updates</h3><span class="live" id="liveSt"><i></i><span>connecting…</span></span></div>
-    <form id="updForm" class="lform"><input id="updIn" maxlength="400" placeholder="Share a short update, e.g. R–H done on EN G5J4" autocomplete="off" aria-label="New update"><button class="btn primary" type="submit">Post</button></form>
-    <div id="updList" class="llist"></div></div>
-   <div class="panel" aria-labelledby="hChat"><div class="row" style="justify-content:space-between"><h3 id="hChat">Quick chat</h3>${link(drive("chat"),"Open Tchap ↗")}</div>
+  return `<section class="ovtop">
+   <div id="overview-projects"><div class="shead"><h2>Projects</h2></div><div class="grid pgrid">${P.map(projCard).join("")}</div></div>
+   <aside class="panel chatp" aria-labelledby="hChat"><div class="row" style="justify-content:space-between"><h3 id="hChat">Chat</h3><span class="row"><span class="live" id="liveSt"><i></i><span>connecting…</span></span>${link(drive("chat"),"Tchap ↗")}</span></div>
     <div id="chatList" class="llist chat" role="log" aria-label="Chat messages"></div>
-    <form id="chatForm" class="lform"><input id="chatName" class="cname" maxlength="30" placeholder="Name" aria-label="Your name"><input id="chatIn" maxlength="1000" placeholder="Message…" autocomplete="off" aria-label="Message"><button class="btn primary" type="submit">Send</button></form></div>
+    <form id="chatForm" class="lform"><input id="chatName" class="cname" maxlength="30" placeholder="Name" aria-label="Your name"><input id="chatIn" maxlength="1000" placeholder="Message…" autocomplete="off" aria-label="Message"><button class="btn primary" type="submit">Send</button></form></aside>
   </section>
   <section><div class="shead"><h2>Recent activity</h2></div>
    ${act.length?`<ol class="feed">${act.map(a=>`<li><time>${fmtD(a.d,1)}</time><span class="dot" style="--c:var(${a.c})" aria-hidden="true"></span><div><div class="t"><a href="${a.h}">${esc(a.k)} · ${esc(a.t)}</a></div>${a.s?`<div class="s">${esc(a.s)}</div>`:""}</div>${a.u&&/^https?:/.test(a.u)?`<a class="btn sm" href="${esc(a.u)}" target="_blank" rel="noopener">Open ↗</a>`:"<span></span>"}</li>`).join("")}</ol>`:`<div class="empty">Nothing logged yet.</div>`}</section>
-  <section id="overview-projects"><div class="shead"><h2>Projects</h2></div><div class="grid pgrid">${P.map(projCard).join("")}</div></section>
   <section class="help"><h3>How to use this hub</h3><ol>
-   <li><b>Post a short update</b> or a chat message above; everyone sees it immediately.</li>
+   <li><b>Chat</b> in the box at the top right; everyone sees the message immediately.</li>
    <li><b>Add things</b> with the <b>＋</b> button on each tab (a measurement, a meeting, a talk, a sample) and fix any card with <b>✎ Edit</b>.</li>
    <li><b>Files stay on sDrive.</b> Upload slides or data there, then paste the link (on sDrive: ⋯ next to the file › <i>Copy internal link</i>).</li>
   </ol></section>`}
@@ -438,7 +434,7 @@ async function startLive(pw){try{const [{initializeApp},{getAuth,signInWithEmail
   drawLive()}catch(e){LV.err="offline";drawLive()}}
 async function livePost(col,obj){if(!LV.on){toast("Not connected yet. Try again in a few seconds.");return false}const {addDoc,collection,serverTimestamp}=LV.fs;try{await addDoc(collection(LV.db,col),{t:serverTimestamp(),...(await encB(CR.k,obj))});return true}catch(e){toast("Could not save");return false}}
 function drawLive(){const st=$("#liveSt");if(!st)return;st.classList.toggle("on",LV.on&&!LV.err);st.lastElementChild.textContent=LV.err||(LV.on?"live":"connecting…");
-  const U=$("#updList");U.innerHTML=LV.updates.length?LV.updates.map(u=>`<div class="li"><div>${esc(u.text)}</div><div class="note">${esc(u.name||"")}${u.name?" · ":""}${esc(ago(u.t))}<button type="button" class="xdel" data-delupd="${esc(u.id)}" aria-label="Delete this update">✕</button></div></div>`).join(""):`<div class="note">No updates yet. Post the first one.</div>`;
+  const U=$("#updList");if(U)U.innerHTML=LV.updates.length?LV.updates.map(u=>`<div class="li"><div>${esc(u.text)}</div><div class="note">${esc(u.name||"")}${u.name?" · ":""}${esc(ago(u.t))}<button type="button" class="xdel" data-delupd="${esc(u.id)}" aria-label="Delete this update">✕</button></div></div>`).join(""):`<div class="note">No updates yet. Post the first one.</div>`;
   const C=$("#chatList");const atBottom=C.scrollHeight-C.scrollTop-C.clientHeight<40;const me=myName();
   C.innerHTML=LV.chat.length?[...LV.chat].reverse().map(m=>`<div class="msg${m.name&&m.name===me?" mine":""}"><div class="mh"><b>${esc(m.name||"?")}</b> · ${esc(ago(m.t))}</div><div>${esc(m.text)}</div></div>`).join(""):`<div class="note">No messages yet. Say hello.</div>`;
   if(atBottom||!C.dataset.init){C.scrollTop=C.scrollHeight;C.dataset.init=1}
@@ -447,7 +443,7 @@ document.addEventListener("submit",async e=>{if(e.target.id==="updForm"){e.preve
   if(e.target.id==="chatForm"){e.preventDefault();const n=$("#chatName").value.trim(),i=$("#chatIn");const v=i.value.trim();if(!n){toast("Enter your name first");$("#chatName").focus();return}if(!v)return;setName(n);if(await livePost("chat",{text:v,name:n}))i.value=""}});
 document.addEventListener("click",async e=>{const b=e.target.closest&&e.target.closest("[data-delupd]");if(!b)return;if(!b.dataset.armed){b.dataset.armed=1;b.textContent="Delete?";setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent="✕"}},3000);return}
   try{await LV.fs.deleteDoc(LV.fs.doc(LV.db,"updates",b.dataset.delupd))}catch(x){toast("Could not delete")}});
-setInterval(()=>{if($("#updList"))drawLive()},60000);
+setInterval(()=>{if($("#chatList"))drawLive()},60000);
 
 /* ---------- encryption & lock ---------- */
 const CR={k:null};
