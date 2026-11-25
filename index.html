@@ -82,6 +82,12 @@ body.locked header,body.locked .tabbar,body.locked main,body.locked footer{filte
 .lt{font:800 26px var(--body);color:var(--ink)}.lt span{color:var(--accent)}
 .lbox input[type=password]{font:inherit;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
 .lrem{display:flex!important;gap:8px;align-items:center;justify-content:flex-start}.lrem input{width:auto;margin:0;flex:none}.lerr{color:#b00020;font-size:14px;min-height:1em}
+.lgrid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))}
+.lbox2{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:10px;align-content:start;min-width:0}
+.lform{display:flex;gap:8px}.lform input{flex:1;min-width:0;font:inherit;font-size:15px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}.lform .cname{flex:0 0 90px}
+.llist{display:grid;gap:8px;max-height:300px;overflow:auto}.li{border-left:3px solid var(--accent);padding:4px 10px;background:var(--bg);border-radius:0 8px 8px 0}
+.chat{align-content:start;min-height:160px}.msg{background:var(--bg);border-radius:10px;padding:7px 10px;max-width:88%}.msg.mine{justify-self:end;background:var(--accent-soft)}.mh{font-size:13px}
+.xdel{border:0;background:none;color:var(--muted);cursor:pointer;font-size:12px;padding:0 4px}
 .mhead{display:grid;gap:12px}
 .mstats{display:flex;flex-wrap:wrap;gap:10px}
 .mstats div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:grid;min-width:92px}
@@ -178,7 +184,15 @@ function vOverview(){
   const P=[...S.projects].sort((a,b)=>(a.order||9)-(b.order||9));
   const last=[...S.runs].sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,4);
   const mt=[...S.meetings].sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,3);
-  return `<section><h2>Projects</h2>${P.length?`<div class="grid pgrid">${P.map(stageCard).join("")}</div>`:`<div class="empty">No projects yet.</div>`}</section>
+  return `<section class="live"><div class="lgrid">
+   <div class="lbox2"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Latest updates</h2><span class="note" id="liveSt"></span></div>
+    <form id="updForm" class="lform"><input id="updIn" maxlength="400" placeholder="What's new? e.g. R–H done on EN G5J4" autocomplete="off"><button class="btn primary" type="submit">Post</button></form>
+    <div id="updList" class="llist"></div></div>
+   <div class="lbox2"><h2 style="margin:0">Chat</h2>
+    <div id="chatList" class="llist chat"></div>
+    <form id="chatForm" class="lform"><input id="chatName" class="cname" maxlength="30" placeholder="Name"><input id="chatIn" maxlength="1000" placeholder="Message…" autocomplete="off"><button class="btn primary" type="submit">Send</button></form></div>
+  </div></section>
+  <section><h2>Projects</h2>${P.length?`<div class="grid pgrid">${P.map(stageCard).join("")}</div>`:`<div class="empty">No projects yet.</div>`}</section>
   <section><h2>Latest measurements</h2><div class="log">${last.length?last.map(runRow).join(""):`<div class="empty">No measurements logged yet.</div>`}</div></section>
   <section><h2>Recent meetings</h2>${mt.length?`<div class="mlist">${mt.map(meetCard).join("")}</div>`:`<div class="log"><div class="empty">No meetings logged yet.</div></div>`}</section>`}
 function bar(c,t){const parts=STC.map(([k,,v])=>[k,c[k]||0,v]).filter(x=>x[1]);
@@ -272,6 +286,27 @@ function vTalks(){
    <div class="filters">${chip("all","All",all.length)}${Object.keys(TK).filter(k=>cnt(k)).map(k=>chip(k,TK[k][0],cnt(k))).join("")}</div></section>
   ${L.length?Object.keys(by).sort().reverse().map(y=>`<section><h2>${y} <span class="cn">${by[y].length}</span></h2><div class="mlist">${by[y].map(talkCard).join("")}</div></section>`).join(""):`<div class="empty">No talks or posters yet.</div>`}
   <p class="note">Slides and posters live in ${link(drive("conf"),"sDrive › 06_Conferences ↗")||"sDrive › 06_Conferences"}; one folder per conference, named YYYY-MM_Conference_City.</p>`}
+const FBC={apiKey:"AIzaSyClJTC7j-8gbVQKinCOG7QFz-ypVLacRMQ",authDomain:"laf-stno-hub.firebaseapp.com",projectId:"laf-stno-hub",storageBucket:"laf-stno-hub.firebasestorage.app",messagingSenderId:"529030906481",appId:"1:529030906481:web:9b460db7a6474a413851d0"};
+const FBV="10.12.2",FBU=m=>`https://www.gstatic.com/firebasejs/${FBV}/firebase-${m}.js`;
+const LV={on:false,err:"",updates:[],chat:[],fs:null,db:null};
+function ago(ms){if(!ms)return "";const s=(Date.now()-ms)/1000;if(s<60)return "now";if(s<3600)return Math.floor(s/60)+" min";if(s<86400)return Math.floor(s/3600)+" h";const d=new Date(ms);return d.getDate()+" "+MON[d.getMonth()]+(d.getFullYear()!==new Date().getFullYear()?" "+d.getFullYear():"")}
+async function startLive(pw){try{const [{initializeApp},{getAuth,signInWithEmailAndPassword},fs]=await Promise.all([import(FBU("app")),import(FBU("auth")),import(FBU("firestore"))]);
+  const app=initializeApp(FBC);await signInWithEmailAndPassword(getAuth(app),"hub@stnolaf.cloud",pw);LV.fs=fs;LV.db=fs.getFirestore(app);LV.on=true;LV.err="";
+  const sub=(col,n,key)=>fs.onSnapshot(fs.query(fs.collection(LV.db,col),fs.orderBy("t","desc"),fs.limit(n)),async snap=>{const out=[];for(const d of snap.docs){const x=d.data();try{out.push({id:d.id,t:x.t&&x.t.toMillis?x.t.toMillis():Date.now(),...(await decB(CR.k,x))})}catch(e){}}LV[key]=out;drawLive()},e=>{LV.err="Live data unavailable";drawLive()});
+  sub("updates",30,"updates");sub("chat",80,"chat");drawLive()}catch(e){LV.err="Live data unavailable";drawLive()}}
+async function livePost(col,obj){if(!LV.on){toast("Not connected yet");return false}const {addDoc,collection,serverTimestamp}=LV.fs;try{await addDoc(collection(LV.db,col),{t:serverTimestamp(),...(await encB(CR.k,obj))});return true}catch(e){toast("Could not save");return false}}
+function myName(){try{return localStorage.getItem("lafhub_name")||""}catch(e){return ""}}
+function drawLive(){const st=$("#liveSt");if(!st)return;st.textContent=LV.err||(LV.on?"live":"connecting…");
+  const U=$("#updList");U.innerHTML=LV.updates.length?LV.updates.map(u=>`<div class="li"><div>${esc(u.text)}</div><div class="note">${esc(u.name||"")}${u.name?" · ":""}${esc(ago(u.t))} <button type="button" class="xdel" data-delupd="${esc(u.id)}" title="Delete">✕</button></div></div>`).join(""):`<div class="note">No updates yet.</div>`;
+  const C=$("#chatList");const atBottom=C.scrollHeight-C.scrollTop-C.clientHeight<40;const me=myName();
+  C.innerHTML=LV.chat.length?[...LV.chat].reverse().map(m=>`<div class="msg${m.name&&m.name===me?" mine":""}"><div class="mh"><b>${esc(m.name||"?")}</b> <span class="note">${esc(ago(m.t))}</span></div><div>${esc(m.text)}</div></div>`).join(""):`<div class="note">No messages yet. Say hello.</div>`;
+  if(atBottom||!C.dataset.init){C.scrollTop=C.scrollHeight;C.dataset.init=1}
+  const cn=$("#chatName");if(cn&&!cn.value)cn.value=me}
+document.addEventListener("submit",async e=>{if(e.target.id==="updForm"){e.preventDefault();const i=$("#updIn");const v=i.value.trim();if(!v)return;if(await livePost("updates",{text:v,name:myName()}))i.value=""}
+  if(e.target.id==="chatForm"){e.preventDefault();const n=$("#chatName").value.trim(),i=$("#chatIn");const v=i.value.trim();if(!n){toast("Enter your name first");$("#chatName").focus();return}if(!v)return;try{localStorage.setItem("lafhub_name",n)}catch(x){}if(await livePost("chat",{text:v,name:n}))i.value=""}});
+document.addEventListener("click",async e=>{const b=e.target.closest&&e.target.closest("[data-delupd]");if(!b)return;if(!b.dataset.armed){b.dataset.armed=1;b.textContent="Delete?";setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent="✕"}},3000);return}
+  try{await LV.fs.deleteDoc(LV.fs.doc(LV.db,"updates",b.dataset.delupd))}catch(x){toast("Could not delete")}});
+setInterval(()=>{if($("#updList"))drawLive()},60000);
 function vFiles(){
   const F=[["root","LAF_Research_Hub","Everything below"],["samples","01 · Samples","SEM images, die maps, wafer data"],["meas","02 · Measurements","Raw .nc files and quick-look plots, one folder per project"],["ep","EP encirclement","Gain maps, encirclement loops"],["stvo","STVO array","S1–S4 measurements"],["sd","Spin-diode","VB01-23 RF maps, R–H, power sweeps"],["floq","Floquet","Drive sweeps"],["meet","03 · Meetings","Slides and minutes, by date"],["papers","04 · Papers","Drafts and figures"],["prb","PRB · Multi-turn EP","Figures and draft"],["code","05 · Code","Pointer to the Git repositories"],["conf","06 · Conferences","Talk slides and posters, one folder per conference"]];
   const OL=S.projects.filter(p=>p.overleaf);
@@ -279,6 +314,7 @@ function vFiles(){
   <p class="note">Naming: measurement folders as <span class="mono">YYYY-MM-DD_sample_device_type</span> (e.g. <span class="mono">2026-11-20_S1_N5_RF</span>), each with the raw .nc file, a config.json of instrument settings and a quick-look .png.</p></section>`}
 
 function bind(v){
+  drawLive();
   document.querySelectorAll("[data-pf]").forEach(b=>b.onclick=()=>{S.pf=b.dataset.pf;render()});
   document.querySelectorAll("[data-sf]").forEach(b=>b.onclick=()=>{S.sf=b.dataset.sf;render()});
   document.querySelectorAll("[data-tf]").forEach(b=>b.onclick=()=>{S.tf=b.dataset.tf;render()});
@@ -320,7 +356,7 @@ async function unlock(pw,remember){const k=await deriveKey(pw,ENC.kdf.salt,ENC.k
   for(const x of ENC.extra||[]){try{const m=await decB(k,x);d.meetings=(d.meetings||[]).filter(y=>y._id!==m._id).concat([m])}catch(e){}}
   CR.k=k;if(remember){try{localStorage.setItem("lafhub_pw",pw)}catch(e){}}
   db=true;Object.assign(S,{projects:d.projects,samples:d.samples,runs:d.runs,meetings:d.meetings,talks:d.talks||[],config:d.config,updated:d.updated});
-  document.body.classList.remove("locked");const L=$("#lock");if(L)L.remove();render()}
+  document.body.classList.remove("locked");const L=$("#lock");if(L)L.remove();render();startLive(pw)}
 function lockScreen(){document.body.classList.add("locked");const L=document.createElement("div");L.id="lock";L.innerHTML=`<form class="lbox" id="lf"><div class="lt">LAF STNO <span>Hub</span></div><p class="note">This page is private. Enter the password.</p>
   <input type="password" id="lpw" autocomplete="current-password" placeholder="Password" required><label class="note lrem"><input type="checkbox" id="lrm" checked> Remember on this device</label>
   <button class="btn primary" type="submit">Open</button><div class="lerr" id="lerr"></div></form>`;document.body.appendChild(L);
