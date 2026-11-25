@@ -150,7 +150,7 @@ dl.info dt{color:var(--muted);font-weight:600}dl.info dd{margin:0;min-width:0;ov
 .lf{display:inline-flex;align-items:center;gap:6px;margin-left:6px}
 .fdot{width:8px;height:8px;border-radius:50%;background:#fff;border:2px solid var(--ink);display:inline-block}
 .dscroll{overflow:auto;max-height:78vh;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;box-shadow:var(--shadow)}
-.dmap{display:grid;gap:4px;width:max-content;min-width:100%}
+.dmap{display:grid;gap:4px;width:max-content}
 .dmap.hasub{gap:6px}
 .dch,.drh{font:600 12px var(--mono);color:var(--muted);display:grid;place-items:center;text-align:center;line-height:1.15}
 .dch small,.drh small{font:500 10px var(--body);color:var(--faint)}
@@ -167,6 +167,11 @@ dl.info dt{color:var(--muted);font-weight:600}dl.info dd{margin:0;min-width:0;ov
 .dv.hasf::after{content:"";position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px var(--ink)}
 .hasub .dv.hasf::after{width:6px;height:6px;top:2px;right:2px}
 .dv[style*="--idle"],.dv[style*="--skip"]{color:var(--ink)}
+.dv .pl{position:absolute;inset:4px;width:calc(100% - 8px);height:calc(100% - 8px);fill:rgba(255,255,255,.95)}
+.dv[style*="--idle"] .pl,.dv[style*="--skip"] .pl{fill:#4f5778}
+.dv[style*="--skip"] .pl{fill:#9aa1bd}
+.dv .pn{position:absolute;left:2px;bottom:0;font:700 9px var(--mono);color:inherit;opacity:.85}
+.dmap.cfg .dv{min-height:46px}
 .dlist{display:flex;flex-wrap:wrap;gap:8px}
 .dv.big{min-height:40px;padding:6px 12px}
 .dpanel{gap:12px}
@@ -389,16 +394,34 @@ function vDie(){const sid=(location.hash.match(/^#die-(.+)$/)||[])[1];const s=S.
   const leg=`<div class="dleg" role="group" aria-label="Highlight devices by status">${Object.entries(STL).filter(([k])=>k==="skip"?Object.values((m||{}).dev||{}).some(d=>d.st==="skip"):c[k]).map(([k,l])=>`<button type="button" class="chip lchip" data-hl="${k}" aria-pressed="${hl===k}"><b style="background:var(${STV[k]})"></b>${esc(l)}${k!=="skip"?` <span class="cn">${c[k]||0}</span>`:""}</button>`).join("")}<span class="note lf"><i class="fdot"></i> has files on sDrive</span></div>`;
   let mapHTML="";
   if(!m||m.list){const names=devNames(sid);mapHTML=`<div class="dlist">${names.length?names.map(n=>devBtn(sid,n,sel,hl,1)).join(""):`<div class="empty">No device list for this sample yet.</div>`}</div>`}
-  else{const g=geo(m);const cw=g.sub?0:(g.cols.length>12?30:38);
-    mapHTML=`<div class="dscroll"><div class="dmap${g.sub?" hasub":""}" style="grid-template-columns:auto repeat(${g.cols.length},${g.sub?"minmax(44px,1fr)":cw+"px"})">
+  else{const g=geo(m);const hasCfg=Object.values(m.dev).some(d=>d.cfg);const cw=g.sub?0:hasCfg?46:(g.cols.length>12?30:38);
+    mapHTML=`<div class="dscroll"><div class="dmap${g.sub?" hasub":""}${hasCfg?" cfg":""}" style="grid-template-columns:auto repeat(${g.cols.length},${g.sub?"minmax(44px,1fr)":cw+"px"})">
      <div class="dcorner">${g.tr?"":""}</div>${g.cols.map(cn=>{const info=g.tr?((m.rowInfo||{})[cn]||""):((m.colInfo||{})[cn]||"");return `<div class="dch">${esc(cn)}${info?`<small>${esc(info)}</small>`:""}</div>`}).join("")}
      ${g.rows.map(r=>{const ri=g.tr?((m.colInfo||{})[r]||""):((m.rowInfo||{})[r]||"");return `<div class="drh">${esc(r)}${ri?`<small>${esc(ri)}</small>`:""}</div>`+g.cols.map(cc=>{const cell=cellOf(m,g,r,cc);
        if(g.sub)return `<div class="dcell">${g.sub.map(j=>cell[j]?devBtn(sid,cell[j],sel,hl):`<span class="dnone"></span>`).join("")}</div>`;
        return cell._?devBtn(sid,cell._,sel,hl):`<span class="dnone"></span>`}).join("")}).join("")}</div></div>
-     <p class="note">${m.colUnit?`Column header: ${esc(m.colUnit)}. `:""}${g.tr?"Map shown rotated (series as rows) to fit the screen. ":""}${g.sub?"Each cell holds junctions J1 J2 / J3 J4. ":""}Files indexed from sDrive on ${esc(fmtD(DEV.scanned))}.</p>`}
+     <p class="note">${hasCfg?"Dots show the pillar arrangement in each cell (from the SEM layout); the number is the pillar count when above 4. ":""}${m.colUnit?`Column header: ${esc(m.colUnit)}. `:""}${g.tr?"Map shown rotated (series as rows) to fit the screen. ":""}${g.sub?"Each cell holds junctions J1 J2 / J3 J4. ":""}Files indexed from sDrive on ${esc(fmtD(DEV.scanned))}.</p>`}
   return `${head}<div class="dwrap"><section class="dmain">${sbar(c,t)}${leg}${mapHTML}</section><aside class="dside" id="dside">${sel?devPanel(sid,sel):samplePanel(s)}</aside></div>`}
+function pillars(cfg,n,spc){cfg=String(cfg||"").toLowerCase();let sp=/far/.test(cfg)?0.85:/medium/.test(cfg)?0.6:0.42;if(spc)sp=0.3+0.6*Math.log(spc/150)/Math.log(2000/150);let P=[];
+  const grid=(k,g)=>{const o=[];for(let i=0;i<k;i++)for(let j=0;j<k;j++)o.push([(i-(k-1)/2)*g,(j-(k-1)/2)*g]);return o};
+  const ring=(k,r,c)=>{const o=c?[[0,0]]:[];for(let i=0;i<k;i++){const a=-Math.PI/2+i*2*Math.PI/k;o.push([r*Math.cos(a),r*Math.sin(a)])}return o};
+  if(/single/.test(cfg))P=[[0,0]];
+  else if(/4 clusters/.test(cfg)){for(const [cx,cy] of [[-.5,-.5],[.5,-.5],[-.5,.5],[.5,.5]])for(const [x,y] of grid(2,.22))P.push([cx+x,cy+y])}
+  else if(/5×5/.test(cfg))P=grid(5,.38);
+  else if(/3×3/.test(cfg))P=grid(3,/far/.test(cfg)?.7:/medium/.test(cfg)?.55:.42);
+  else if(/2×2/.test(cfg))P=grid(2,sp*1.3);
+  else if(/diamond/.test(cfg))P=[[0,-.6],[.6,0],[0,.6],[-.6,0]];
+  else if(/cross/.test(cfg)){const d=/far/.test(cfg)?.75:.5;P=[[0,0],[d,0],[-d,0],[0,d],[0,-d]]}
+  else if(/ring of 10/.test(cfg))P=ring(10,.75);
+  else if(/pentagon \+ centre/.test(cfg))P=ring(5,.7,1);
+  else if(/ring of 5|pentagon/.test(cfg))P=ring(5,.7);
+  else if(/triangle/.test(cfg)){const r=spc?Math.min(sp*1.1,.78):/far/.test(cfg)?.75:.5;P=ring(3,r)}
+  else if(/pair/.test(cfg)){const d=sp;P=/vertical/.test(cfg)?[[0,-d],[0,d]]:/diagonal/.test(cfg)?[[-d*.75,-d*.75],[d*.75,d*.75]]:[[-d,0],[d,0]]}
+  else if(n)P=ring(n,.6,0);
+  if(!P.length)return "";const k=P.length,r=k>=16?.1:k>=9?.13:k>=5?.17:.24;
+  return `<svg class="pl" viewBox="-1.1 -1.1 2.2 2.2" aria-hidden="true">${P.map(([x,y])=>`<circle cx="${x.toFixed(3)}" cy="${y.toFixed(3)}" r="${r}"/>`).join("")}</svg>`}
 function devBtn(sid,n,sel,hl,big){const d=devGet(sid,n)||{st:"untested"};const f=devFiles(sid,n).length;const st=d.st||"untested";
-  return `<button type="button" class="dv${big?" big":""}${sel===n?" on":""}${hl&&hl!==st?" dim":""}${f?" hasf":""}" style="--c:var(${STV[st]||"--idle"})" data-dev="${esc(n)}" title="${esc(n+" · "+(STL[st]||st))}" aria-label="${esc(n+", "+(STL[st]||st)+(f?", has files":""))}">${big?esc(n):""}</button>`}
+  return `<button type="button" class="dv${big?" big":""}${sel===n?" on":""}${hl&&hl!==st?" dim":""}${f?" hasf":""}" style="--c:var(${STV[st]||"--idle"})" data-dev="${esc(n)}" title="${esc(n+" · "+(STL[st]||st)+(d.cfg?" · "+d.cfg:""))}" aria-label="${esc(n+", "+(STL[st]||st)+(d.cfg?", "+d.cfg:"")+(f?", has files":""))}">${big?esc(n):(d.cfg?pillars(d.cfg,d.n,+d.sp||0)+(d.n>4?`<span class="pn">${d.n}</span>`:""):"")}</button>`}
 function samplePanel(s){return `<div class="panel"><h3>About this die</h3><p class="note" style="margin:0">Click a device on the map to see its status, its measurement folders and slides on sDrive, and to update it.</p>
   <div class="links">${link(s.layout,"Layout ↗")}${link(s.drive,"Sample info ↗")}${link(s.data,"Measurement data ↗")}</div>
   ${(s.info||[]).length?`<dl class="info">${s.info.map(i=>`<dt>${esc(i.k)}</dt><dd>${esc(i.v)}</dd>`).join("")}</dl>`:""}</div>`}
