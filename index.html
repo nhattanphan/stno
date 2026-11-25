@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>LAF STNO Hub</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Archivo:wght@600;700;800&display=swap">
+<style>
+/* Layout: lab-notebook index — a narrow header band, tabbed views, cards only for projects and samples; logs as ruled rows. */
+:root{
+  --bg:#e8ecf6; --surface:#f5f7fc; --ink:#151a33; --muted:#535b7e; --line:#d2d8ea; color-scheme:light;
+  --navy:#1d2a6b; --accent:#c2185b; --accent-soft:#fbe4ee;
+  --ok:#2e7d4f; --warn:#b7791f; --bad:#c0392b; --bad2:#7b1d1d; --vio:#6b4bb3; --idle:#b6bccf;
+  --display:"Archivo","IBM Plex Sans",system-ui,sans-serif; --body:"IBM Plex Sans",system-ui,-apple-system,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+:root[data-theme="dark"]{--bg:#0f1224;--surface:#171b33;--ink:#e8eaf6;--muted:#9aa1c4;--line:#2a3052;--navy:#9fb0ff;--accent:#ff6fa6;--accent-soft:#3a1a2b;--ok:#5ccf8a;--warn:#e7b04d;--bad:#ff7a6b;--bad2:#d65a5a;--vio:#b39cff;--idle:#4a5172;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--body);margin:0}
+a{color:var(--navy)}
+.wrap{max-width:1680px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{background:linear-gradient(180deg,#f3f5fb,#e9edf8);border-bottom:1px solid var(--line)}
+header .wrap{padding-block:22px 18px;display:grid;gap:14px}
+.hbtns{display:flex;flex-wrap:wrap;gap:8px}.btn.chatbtn{background:var(--accent);border-color:var(--accent);color:#fff}.btn.chatbtn:hover{filter:brightness(1.08);border-color:var(--accent)}
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+h1{font:800 clamp(26px,5vw,36px)/1.05 var(--display);letter-spacing:-.01em;margin:0;color:var(--ink);text-wrap:balance}
+h1 span{color:var(--accent)}
+.who{color:var(--muted);font-size:14px;margin-top:6px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:8px 12px;font:500 14px var(--body);text-decoration:none;cursor:pointer}
+.btn:hover{border-color:var(--navy)}
+.btn.primary{background:var(--navy);border-color:var(--navy);color:var(--bg)}
+.btn:focus-visible,.tab:focus-visible,.chip:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tabbar{position:sticky;top:0;z-index:20;background:#1d2a6b;box-shadow:0 4px 14px rgba(15,18,36,.22)}
+.tabbar .wrap{padding-block:8px}
+nav.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;border:0;background:none;color:rgba(255,255,255,.78);font:600 15px var(--body);padding:9px 16px;border-radius:999px;cursor:pointer;text-decoration:none;transition:background .15s,color .15s}
+.tab:hover{background:rgba(255,255,255,.12);color:#fff}
+.tab[aria-current="page"]{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(194,24,91,.35)}
+.tabbar .tab .n{color:inherit;opacity:.75}
+.tab .sm{display:none}
+@media (max-width:560px){.tab .lg{display:none}.tab .sm{display:inline}nav.tabs{gap:0;margin:0 -10px}.tab{font-size:13px;padding:8px 9px}.tabbar .tab .n{display:none}}
+.tab .n{font:500 12px var(--mono);color:var(--muted);margin-left:4px}
+main .wrap{padding-block:24px 48px;display:grid;gap:28px}
+h2{font:700 13px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(min(100%,380px),1fr))}
+.pgrid{grid-template-columns:repeat(auto-fill,minmax(min(100%,640px),1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:10px;min-width:0;align-content:start}
+.card h3{font:700 19px/1.2 var(--display);margin:0}
+.card .sub{color:var(--muted);font-size:14px;margin-top:-4px}
+.pill{display:inline-block;font:600 11.5px var(--body);letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.pj{font:600 12px var(--body);padding:2px 8px;border-radius:6px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+ul.next{margin:0;padding-left:18px}
+ul.next li{margin:2px 0}
+.lbl{font:600 12px var(--body);color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.facts{margin:0;padding-left:18px;color:var(--muted);font-size:14px}
+.bar{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--idle)}
+.bar i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font:500 12.5px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.legend b{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:0}
+dl.info{display:grid;grid-template-columns:minmax(80px,auto) 1fr;gap:4px 12px;margin:0;font-size:13.5px}
+dl.info dt{color:var(--muted);font-weight:600}
+dl.info dd{margin:0;min-width:0;overflow-wrap:anywhere}
+details summary{cursor:pointer;color:var(--navy);font-weight:600;font-size:14px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 12px;font:500 13px var(--body);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input,textarea,select{font:14px var(--body);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;min-width:0}
+textarea{min-height:70px;resize:vertical}
+.search{max-width:260px}
+.addm{background:var(--surface);border:1px dashed var(--line);border-radius:12px;padding:10px 14px}
+.addm summary{font-weight:700}.addbox{display:grid;gap:10px;margin-top:10px}
+.addbox label{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+.addbox input,.addbox select,.addbox textarea{font:inherit;font-size:14px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+.addbox ol{margin:0;padding-left:18px;display:grid;gap:2px}
+body.locked header,body.locked .tabbar,body.locked main,body.locked footer{filter:blur(6px);pointer-events:none;user-select:none}
+#lock{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:rgba(232,236,246,.75)}
+.lbox{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;width:min(100%,360px);display:grid;gap:12px;box-shadow:0 10px 30px rgba(15,18,36,.15)}
+.lt{font:800 26px var(--body);color:var(--ink)}.lt span{color:var(--accent)}
+.lbox input[type=password]{font:inherit;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+.lrem{display:flex!important;gap:8px;align-items:center;justify-content:flex-start}.lrem input{width:auto;margin:0;flex:none}.lerr{color:#b00020;font-size:14px;min-height:1em}
+.mhead{display:grid;gap:12px}
+.mstats{display:flex;flex-wrap:wrap;gap:10px}
+.mstats div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:grid;min-width:92px}
+.mstats b{font:700 20px var(--body);color:var(--ink)}.mstats span{font-size:12px;color:var(--muted)}
+.cn{font:500 12px var(--mono);opacity:.7}
+.mlist{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(min(100%,460px),1fr))}
+.mt{display:grid;grid-template-columns:56px 1fr auto;gap:14px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+.md{display:grid;place-items:center;border-radius:10px;background:var(--accent-soft);color:var(--accent);padding:6px 0;line-height:1.1}
+.md b{font:700 22px var(--body)}.md span{font:600 12px var(--body);text-transform:uppercase;letter-spacing:.04em}
+.mb{min-width:0;display:grid;gap:6px}.mtt{font-weight:600;font-size:15.5px}
+.mtag{font:600 11.5px var(--body);padding:2px 9px;border-radius:999px;color:var(--c);border:1px solid currentColor}
+.mslides{align-self:center;white-space:nowrap}
+@media (max-width:560px){.mstats div{padding:8px 12px}.mstats b{font-size:17px}.mt{grid-template-columns:48px 1fr}.mslides{grid-column:2;justify-self:start}}
+.log{background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.entry{display:grid;grid-template-columns:110px 1fr;gap:4px 16px;padding:14px 16px;border-top:1px solid var(--line)}
+.entry:first-child{border-top:0}
+.entry .d{font:500 13px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.entry .main{min-width:0;display:grid;gap:4px}
+.entry .dev{font-weight:600}
+.entry .res{font-size:14px}
+.entry .meta{font-size:13px;color:var(--muted)}
+.mono{font:12.5px var(--mono);color:var(--muted);overflow-wrap:anywhere}
+.del{border:0;background:none;color:var(--muted);cursor:pointer;font-size:12px;padding:0;text-decoration:underline;justify-self:start}
+.empty{padding:22px 16px;color:var(--muted)}
+form.add{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:14px}
+form.add .wide{grid-column:1/-1}
+form.add label{display:grid;gap:4px;font:600 12px var(--body);color:var(--muted)}
+.files{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr))}
+.files a{display:grid;gap:2px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);text-decoration:none;color:var(--ink)}
+.files a span{font-size:13px;color:var(--muted)}
+.files a:hover{border-color:var(--navy)}
+.note{font-size:13px;color:var(--muted)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:14px}
+@media (max-width:560px){.entry{grid-template-columns:1fr}.search{max-width:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head><body>
+
+<header>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>LAF STNO <span>Hub</span></h1>
+        <div class="who">Nhat-Tan Phan · Laboratoire Albert Fert · coupled spin-torque oscillators and MTJ rectification</div>
+      </div>
+      <div class="hbtns"><a class="btn chatbtn" id="chatLink" href="https://www.tchap.gouv.fr/" target="_blank" rel="noopener">💬 Chat on Tchap ↗</a><a class="btn primary" id="driveRoot" href="#" target="_blank" rel="noopener">Open sDrive folder ↗</a></div>
+    </div>
+  </div>
+</header>
+<div class="tabbar"><div class="wrap">
+  <nav class="tabs" aria-label="Sections">
+      <a class="tab" href="#overview" data-v="overview">Projects</a>
+      <a class="tab" href="#samples" data-v="samples">Samples<span class="n" id="nS"></span></a>
+      <a class="tab" href="#measurements" data-v="measurements"><span class="lg">Measurements</span><span class="sm">Data</span><span class="n" id="nR"></span></a>
+      <a class="tab" href="#meetings" data-v="meetings">Meetings<span class="n" id="nM"></span></a>
+      <a class="tab" href="#talks" data-v="talks">Talks<span class="n" id="nT"></span></a>
+      <a class="tab" href="#files" data-v="files">Files</a>
+    </nav>
+</div></div>
+
+<main><div class="wrap" id="view"><div class="empty">Loading the hub…</div></div></main>
+
+<script>
+const PJ={ep:"EP encirclement",stvo:"STVO array",sd:"Spin-diode",floq:"Floquet"};
+const STC=[["alive","Alive","--ok"],["untested","Untested","--idle"],["suspect","Suspect","--warn"],["dead","Dead","--bad"],["measdead","Died in measurement","--bad2"],["short","Short","--vio"],["open","Open","--vio"]];
+const S={projects:[],samples:[],runs:[],meetings:[],talks:[],config:{},ready:{},canWrite:false,canAdmin:false,pf:"all",q:"",sf:"all"};
+let db=null;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const link=(u,t)=>u&&/^https?:\/\//.test(u)?`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)}</a>`:"";
+function toast(t){const e=document.createElement("div");e.className="toast";e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2200)}
+function view(){const v=(location.hash||"#overview").slice(1);return ["overview","samples","measurements","meetings","talks","files"].includes(v)?v:"overview"}
+function drive(k){return (S.config&&S.config[k])||""}
+
+function render(){
+  const v=view();document.querySelectorAll(".tab").forEach(t=>{if(t.dataset.v===v)t.setAttribute("aria-current","page");else t.removeAttribute("aria-current")});
+  $("#nS").textContent=S.samples.length||"";$("#nR").textContent=S.runs.length||"";$("#nM").textContent=S.meetings.length||"";$("#nT").textContent=S.talks.length||"";
+  const up=document.getElementById("upd");if(up&&S.updated)up.textContent=" Last updated "+S.updated+".";const ch=$("#chatLink");if(ch&&drive("chat"))ch.href=drive("chat");const r=$("#driveRoot");if(drive("root")){r.href=drive("root");r.hidden=false}else r.hidden=true;
+  const el=$("#view");
+  if(!db){el.innerHTML=`<div class="empty">Loading…</div>`;return}
+  el.innerHTML=({overview:vOverview,samples:vSamples,measurements:vRuns,meetings:vMeetings,talks:vTalks,files:vFiles})[v]();
+  bind(v);
+}
+function stageCard(p){
+  const n=S.runs.filter(r=>r.project===p.key).length,sm=S.samples.filter(s=>s.project===p.key).length;
+  return `<article class="card"><div class="row"><span class="pill">${esc(p.stage)}</span><span class="note">${n} measurement${n===1?"":"s"} · ${sm} sample${sm===1?"":"s"}</span></div>
+  <h3>${esc(p.name)}</h3><div class="sub">${esc(p.title)}</div><p style="margin:0">${esc(p.summary)}</p>
+  ${p.next&&p.next.length?`<div><div class="lbl">Next</div><ul class="next">${p.next.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}
+  ${p.facts&&p.facts.length?`<details><summary>Setup notes</summary><ul class="facts">${p.facts.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>`:""}
+  ${p.overleaf?`<a class="btn primary" style="justify-self:start" href="${esc(p.overleaf)}" target="_blank" rel="noopener">✍️ Read the paper draft on Overleaf ↗</a>`:""}
+  ${S.canAdmin&&(p.paper||p.overleaf)?`<details${p.overleaf?"":" open"}><summary>${p.overleaf?"Change Overleaf link":"Add the Overleaf link"}</summary><form class="row olf" data-pid="${esc(p._id)}" style="margin-top:8px"><input type="url" id="ol-${esc(p._id)}" placeholder="https://www.overleaf.com/project/…" value="${esc(p.overleaf||"")}" style="flex:1 1 200px"><button class="btn" type="submit">Save</button></form></details>`:""}
+  <div class="row">${link(p.drive,"sDrive data ↗")}${p.paper?" · "+link(p.paper,"Paper folder ↗"):""} · <a href="#samples" data-pf="${esc(p.key)}">Samples</a> · <a href="#measurements" data-rf="${esc(p.key)}">Measurements</a></div></article>`}
+function vOverview(){
+  const P=[...S.projects].sort((a,b)=>(a.order||9)-(b.order||9));
+  const last=[...S.runs].sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,4);
+  const mt=[...S.meetings].sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,3);
+  return `<section><h2>Projects</h2>${P.length?`<div class="grid pgrid">${P.map(stageCard).join("")}</div>`:`<div class="empty">No projects yet.</div>`}</section>
+  <section><h2>Latest measurements</h2><div class="log">${last.length?last.map(runRow).join(""):`<div class="empty">No measurements logged yet.</div>`}</div></section>
+  <section><h2>Recent meetings</h2>${mt.length?`<div class="mlist">${mt.map(meetCard).join("")}</div>`:`<div class="log"><div class="empty">No meetings logged yet.</div></div>`}</section>`}
+function bar(c,t){const parts=STC.map(([k,,v])=>[k,c[k]||0,v]).filter(x=>x[1]);
+  return `<div class="bar" role="img" aria-label="${parts.map(([k,n])=>n+" "+k).join(", ")}">${parts.map(([k,n,v])=>`<i style="width:${n/t*100}%;background:var(${v})"></i>`).join("")}</div>
+  <div class="legend">${parts.map(([k,n,v])=>`<span><b style="background:var(${v})"></b>${n} ${esc(STC.find(x=>x[0]===k)[1].toLowerCase())}</span>`).join("")}</div>`}
+function vSamples(){
+  const L=[...S.samples].filter(s=>S.sf==="all"||s.project===S.sf).sort((a,b)=>(a.order||9)-(b.order||9));
+  return `<section><div class="filters" style="margin-bottom:14px">${chips("sf")}</div>
+  ${L.length?`<div class="grid">${L.map(s=>`<article class="card"><div class="row"><span class="pj">${esc(PJ[s.project]||s.project)}</span><span class="note">${s.total?s.total+" devices":"no device map yet"}</span></div>
+  <h3>${esc(s.name)}</h3><div class="sub">${esc(s.subtitle)}</div>${bar(s.counts||{},s.total||1)}
+  <details><summary>Details</summary><dl class="info">${(s.info||[]).map(i=>`<dt>${esc(i.k)}</dt><dd>${esc(i.v)}</dd>`).join("")}</dl></details>
+  <div class="row">${s.layout?link(s.layout,"Layout ↗")+" · ":""}${link(s.drive,"Sample info ↗")}${s.data?" · "+link(s.data,"Measurement data ↗"):""}</div></article>`).join("")}</div>`:`<div class="empty">No samples for this project.</div>`}</section>`}
+function chips(key){const cur=S[key];return [["all","All"]].concat(Object.entries(PJ)).map(([k,n])=>`<button type="button" class="chip" data-${key}="${k}" aria-pressed="${cur===k}">${esc(n)}</button>`).join("")}
+function runRow(r){return `<div class="entry"><div class="d">${esc(r.date)}</div><div class="main"><div class="row"><span class="dev">${esc(r.device)}</span><span class="pj">${esc(PJ[r.project]||r.project)}</span></div>
+  ${r.result?`<div class="res">${esc(r.result)}</div>`:""}${r.params?`<div class="meta">${esc(r.params)}</div>`:""}${r.setup?`<div class="meta">Setup: ${esc(r.setup)}</div>`:""}
+  ${r.notes?`<div class="meta">${esc(r.notes)}</div>`:""}${r.file?(/^https?:/.test(r.file)?link(r.file,"Data ↗"):`<div class="mono">${esc(r.file)}</div>`):""}
+  ${S.canAdmin&&r._id?`<button type="button" class="del" data-delrun="${esc(r._id)}">Delete</button>`:""}</div></div>`}
+function vRuns(){
+  const q=S.q.toLowerCase();const L=[...S.runs].filter(r=>(S.pf==="all"||r.project===S.pf)&&(!q||JSON.stringify(r).toLowerCase().includes(q))).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  return `<section><div class="filters" style="margin-bottom:14px">${chips("pf")}<input class="search" id="q" type="search" placeholder="Search device, result, file…" value="${esc(S.q)}"></div>
+  <div class="log">${L.length?L.map(runRow).join(""):`<div class="empty">No measurements match.</div>`}</div></section>
+  ${S.canWrite?`<section><h2>Log a measurement</h2><form class="add" id="fRun">
+   <label>Date<input id="rDate" type="date" required></label>
+   <label>Project<select id="rProj">${Object.entries(PJ).map(([k,n])=>`<option value="${k}">${esc(n)}</option>`).join("")}</select></label>
+   <label>Device<input id="rDev" required placeholder="e.g. STVO S1 N5"></label>
+   <label class="wide">Result<textarea id="rRes" placeholder="What came out of it"></textarea></label>
+   <label class="wide">Parameters<input id="rPar" placeholder="f range, H range, power, angle…"></label>
+   <label>Setup<input id="rSet" placeholder="E8257D, Keithley 7510…"></label>
+   <label>Data link or file path<input id="rFile" placeholder="Drive link or D:\\Tan\\…"></label>
+   <div class="wide"><button class="btn primary" type="submit">Add measurement</button></div></form></section>`:""}`}
+function meetRow(m){return `<div class="entry"><div class="d">${esc(m.date)}</div><div class="main"><div class="dev">${esc(m.title)}</div>
+  ${m.who?`<div class="meta">${esc(m.who)}</div>`:""}${m.decisions?`<div class="res"><span class="lbl">Decisions</span><br>${esc(m.decisions)}</div>`:""}
+  ${m.actions?`<div class="res"><span class="lbl">Actions</span><br>${esc(m.actions)}</div>`:""}<div class="row">${link(m.slides,"Slides ↗")}</div>
+  ${S.canAdmin&&m._id?`<button type="button" class="del" data-delmeet="${esc(m._id)}">Delete</button>`:""}</div></div>`}
+const MT={group:["Group meeting","--navy"],spincom:["SPINCOM","--accent"],collab:["Collaborators","--vio"],other:["Other","--muted"]};
+function mType(m){if(m.type)return m.type;const s=(m._id||"")+" "+(m.title||"");return /spincom/i.test(s)?"spincom":/group/i.test(s)?"group":/claudio|collab|meeting with/i.test(s)?"collab":"other"}
+const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function meetCard(m){const [y,mo,d]=String(m.date).split("-");const t=MT[mType(m)]||MT.other;const more=m.decisions||m.actions;
+  return `<article class="mt"><div class="md"><b>${esc(String(+d||""))}</b><span>${esc(MON[(+mo||1)-1])}</span></div>
+  <div class="mb"><div class="row"><span class="mtag" style="--c:var(${t[1]})">${esc(t[0])}</span>${m.who?`<span class="note">${esc(m.who)}</span>`:""}</div>
+  <div class="mtt">${esc(m.title)}</div>
+  ${more?`<details><summary>Decisions & actions</summary>${m.decisions?`<div class="res"><span class="lbl">Decisions</span><br>${esc(m.decisions)}</div>`:""}${m.actions?`<div class="res"><span class="lbl">Actions</span><br>${esc(m.actions)}</div>`:""}</details>`:""}
+  ${S.canAdmin&&m._id?`<button type="button" class="del" data-delmeet="${esc(m._id)}">Delete</button>`:""}</div>
+  ${m.slides?`<a class="btn mslides" href="${esc(m.slides)}" target="_blank" rel="noopener">Slides ↗</a>`:""}</article>`}
+function vMeetings(){
+  const all=[...S.meetings].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  const mf=S.mf||"all",my=S.my||"all",q=(S.mq||"").toLowerCase();
+  const cnt=k=>all.filter(m=>mType(m)===k).length;
+  const years=[...new Set(all.map(m=>String(m.date).slice(0,4)))];
+  const L=all.filter(m=>(mf==="all"||mType(m)===mf)&&(my==="all"||String(m.date).startsWith(my))&&(!q||JSON.stringify(m).toLowerCase().includes(q)));
+  const by={};L.forEach(m=>{const y=String(m.date).slice(0,4);(by[y]=by[y]||[]).push(m)});
+  const chip=(key,val,label,n)=>`<button type="button" class="chip" data-${key}="${esc(val)}" aria-pressed="${(S[key]||"all")===val}">${esc(label)}${n!=null?` <span class="cn">${n}</span>`:""}</button>`;
+  return `<section class="mhead">
+   <div class="mstats"><div><b>${all.length}</b><span>meetings</span></div>${all[0]?`<div><b>${(()=>{const [y,m,d]=String(all[0].date).split("-");return esc(+d+" "+MON[+m-1]+" "+y)})()}</b><span>latest</span></div>`:""}</div>
+   <div class="filters">${chip("mf","all","All",all.length)}${Object.keys(MT).filter(k=>cnt(k)).map(k=>chip("mf",k,MT[k][0],cnt(k))).join("")}</div>
+   <div class="filters">${chip("my","all","All years")}${years.map(y=>chip("my",y,y)).join("")}<input class="search" id="mq" type="search" placeholder="Search title, people, decisions…" value="${esc(S.mq||"")}"></div><details class="addm"><summary>＋ Add a meeting</summary>
+   <div class="addbox"><div class="row"><label>Date <input type="date" id="amDate"></label>
+   <label>Type <select id="amType"><option value="Group">Group meeting</option><option value="SPINCOM">SPINCOM</option><option value="Collab">Collaborators</option><option value="Meeting">Other</option></select></label></div>
+   <label>Topic <input id="amTopic" placeholder="e.g. spin-diode EN/DM, S1 N5"></label>
+   <label>Participants <input id="amWho" placeholder="e.g. Vincent, Romain"></label>
+   <label>Decisions <textarea id="amDec" rows="2"></textarea></label>
+   <label>Actions <textarea id="amAct" rows="2"></textarea></label>
+   <label>Slides link on sDrive (optional) <input id="amSl" placeholder="https://sdrive.cnrs.fr/f/…"></label>
+   <div class="note">Folder name: <b class="mono" id="amName"></b></div>
+   <div class="row"><button type="button" class="btn" id="amGo">1 · Copy folder name &amp; open sDrive ↗</button><button type="button" class="btn primary" id="amAdd">2 · Add to the website ↗</button></div>
+   <p class="note" style="margin:0">Step 2 opens GitHub with everything filled in: tap <b>Create</b>. The card appears here about a minute later.</p></div></details></section>
+  ${L.length?Object.keys(by).sort().reverse().map(y=>`<section><h2>${y} <span class="cn">${by[y].length}</span></h2><div class="mlist">${by[y].map(meetCard).join("")}</div></section>`).join(""):`<div class="empty">${all.length?"No meeting matches.":"No meetings logged yet. Slides go in sDrive › 03_Meetings, one folder per meeting."}</div>`}
+  <p class="note">Slides live in ${link(drive("meet"),"sDrive › 03_Meetings ↗")||"the Meetings folder on sDrive"}; one subfolder per meeting, named YYYY-MM-DD_type.</p>
+  ${S.canWrite?`<section><h2>Add a meeting</h2><form class="add" id="fMeet">
+   <label>Date<input id="mDate" type="date" required></label>
+   <label class="wide">Title<input id="mTitle" required placeholder="e.g. Weekly meeting · EP loops and STVO S1"></label>
+   <label>Attendees<input id="mWho" placeholder="Vincent, Romain, Tan"></label>
+   <label>Slides link<input id="mSlides" type="url" placeholder="https://drive.google.com/…"></label>
+   <label class="wide">Decisions<textarea id="mDec"></textarea></label>
+   <label class="wide">Actions<textarea id="mAct"></textarea></label>
+   <div class="wide"><button class="btn primary" type="submit">Add meeting</button></div></form></section>`:""}`}
+const TK={oral:["Oral talk","--navy"],invited:["Invited talk","--accent"],poster:["Poster","--vio"],seminar:["Seminar","--ok"]};
+function talkCard(t){const [y,mo]=String(t.date).split("-");const k=TK[t.kind]||[t.kind,"--muted"];
+  return `<article class="mt"><div class="md"><b>${esc(MON[(+mo||1)-1])}</b><span>${esc(y)}</span></div>
+  <div class="mb"><div class="row"><span class="mtag" style="--c:var(${k[1]})">${esc(k[0])}</span>${t.project?`<span class="pj">${esc(PJ[t.project]||t.project)}</span>`:""}</div>
+  <div class="mtt">${esc(t.title)}</div><div class="note">${esc(t.conf)}${t.place?" · "+esc(t.place):""}${t.dates?" · "+esc(t.dates):""}</div>
+  ${t.note?`<div class="meta">${esc(t.note)}</div>`:""}
+  <div class="row">${t.url?link(t.url,"Conference site ↗"):""}</div></div>
+  ${t.files?`<a class="btn mslides" href="${esc(t.files)}" target="_blank" rel="noopener">${t.kind==="poster"?"Poster":"Slides"} ↗</a>`:""}</article>`}
+function vTalks(){
+  const all=[...S.talks].sort((a,b)=>String(b.date).localeCompare(String(a.date))||String(a.kind).localeCompare(String(b.kind)));
+  const tf=S.tf||"all";const cnt=k=>all.filter(t=>t.kind===k).length;
+  const L=all.filter(t=>tf==="all"||t.kind===tf);const by={};L.forEach(t=>{const y=String(t.date).slice(0,4);(by[y]=by[y]||[]).push(t)});
+  const chip=(v,l,n)=>`<button type="button" class="chip" data-tf="${v}" aria-pressed="${tf===v}">${esc(l)} <span class="cn">${n}</span></button>`;
+  return `<section class="mhead"><div class="mstats"><div><b>${all.length}</b><span>contributions</span></div><div><b>${new Set(all.map(t=>t.conf)).size}</b><span>conferences</span></div></div>
+   <div class="filters">${chip("all","All",all.length)}${Object.keys(TK).filter(k=>cnt(k)).map(k=>chip(k,TK[k][0],cnt(k))).join("")}</div></section>
+  ${L.length?Object.keys(by).sort().reverse().map(y=>`<section><h2>${y} <span class="cn">${by[y].length}</span></h2><div class="mlist">${by[y].map(talkCard).join("")}</div></section>`).join(""):`<div class="empty">No talks or posters yet.</div>`}
+  <p class="note">Slides and posters live in ${link(drive("conf"),"sDrive › 06_Conferences ↗")||"sDrive › 06_Conferences"}; one folder per conference, named YYYY-MM_Conference_City.</p>`}
+function vFiles(){
+  const F=[["root","LAF_Research_Hub","Everything below"],["samples","01 · Samples","SEM images, die maps, wafer data"],["meas","02 · Measurements","Raw .nc files and quick-look plots, one folder per project"],["ep","EP encirclement","Gain maps, encirclement loops"],["stvo","STVO array","S1–S4 measurements"],["sd","Spin-diode","VB01-23 RF maps, R–H, power sweeps"],["floq","Floquet","Drive sweeps"],["meet","03 · Meetings","Slides and minutes, by date"],["papers","04 · Papers","Drafts and figures"],["prb","PRB · Multi-turn EP","Figures and draft"],["code","05 · Code","Pointer to the Git repositories"],["conf","06 · Conferences","Talk slides and posters, one folder per conference"]];
+  const OL=S.projects.filter(p=>p.overleaf);
+  return `${OL.length?`<section><h2>Paper writing</h2><div class="files">${OL.map(p=>`<a href="${esc(p.overleaf)}" target="_blank" rel="noopener"><b>Overleaf · ${esc(p.name)} ↗</b><span>${esc(p.title)}</span></a>`).join("")}</div></section>`:""}<section><h2>sDrive (CNRS login)</h2><div class="files">${F.filter(([k])=>drive(k)).map(([k,n,d])=>`<a href="${esc(drive(k))}" target="_blank" rel="noopener"><b>${esc(n)} ↗</b><span>${esc(d)}</span></a>`).join("")}</div>
+  <p class="note">Naming: measurement folders as <span class="mono">YYYY-MM-DD_sample_device_type</span> (e.g. <span class="mono">2026-11-20_S1_N5_RF</span>), each with the raw .nc file, a config.json of instrument settings and a quick-look .png.</p></section>`}
+
+function bind(v){
+  document.querySelectorAll("[data-pf]").forEach(b=>b.onclick=()=>{S.pf=b.dataset.pf;render()});
+  document.querySelectorAll("[data-sf]").forEach(b=>b.onclick=()=>{S.sf=b.dataset.sf;render()});
+  document.querySelectorAll("[data-tf]").forEach(b=>b.onclick=()=>{S.tf=b.dataset.tf;render()});
+  {const d=$("#amDate"),t=$("#amType"),n=$("#amName"),g=$("#amGo"),a=$("#amAdd");if(d){if(!d.value)d.value=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+    const upd=()=>{n.textContent=d.value+"_"+t.value};d.onchange=t.onchange=upd;upd();
+    g.onclick=()=>{const name=n.textContent;try{navigator.clipboard.writeText(name).catch(()=>{})}catch(e){}window.open(drive("meet"),"_blank","noopener");toast("Copied "+name+". Create the folder in 03_Meetings.")};
+    a.onclick=async()=>{if(!CR.k){toast("Unlock the page first");return}const v=id=>($(id).value||"").trim();const typ=t.value;const T={Group:["Group meeting","group"],SPINCOM:["SPINCOM meeting","spincom"],Collab:["Meeting with collaborators","collab"],Meeting:["Meeting","other"]}[typ];
+      const m={_id:d.value+"_"+typ,date:d.value,type:T[1],title:T[0]+(v("#amTopic")?" · "+v("#amTopic"):""),slides:v("#amSl")||drive("meet")};for(const [k,id] of [["who","#amWho"],["decisions","#amDec"],["actions","#amAct"]])if(v(id))m[k]=v(id);
+      const w=window.open("about:blank","_blank");const blob=await encB(CR.k,m);const body="Encrypted meeting entry from the hub. Submit to add it.\n\n```json\n"+JSON.stringify(blob)+"\n```";
+      const url="https://github.com/nhattanphan/stno/issues/new?title="+encodeURIComponent("Add meeting")+"&body="+encodeURIComponent(body);if(w)w.location=url;else location.href=url}}}
+  document.querySelectorAll("[data-mf]").forEach(b=>b.onclick=()=>{S.mf=b.dataset.mf;render()});
+  document.querySelectorAll("[data-my]").forEach(b=>b.onclick=()=>{S.my=b.dataset.my;render()});
+  {const q=$("#mq");if(q)q.oninput=()=>{S.mq=q.value;const p=q.selectionStart;render();const n=$("#mq");n.focus();try{n.setSelectionRange(p,p)}catch(e){}}}
+  document.querySelectorAll("a[data-rf]").forEach(a=>a.onclick=()=>{S.pf=a.dataset.rf});
+  document.querySelectorAll("a[data-pf]").forEach(a=>{if(a.tagName==="A")a.onclick=()=>{S.sf=a.dataset.pf}});
+  const q=$("#q");if(q)q.oninput=()=>{S.q=q.value;const p=q.selectionStart;render();const n=$("#q");n.focus();try{n.setSelectionRange(p,p)}catch(e){}};
+  const today=new Date().toISOString().slice(0,10);
+  const fr=$("#fRun");if(fr){$("#rDate").value=$("#rDate").value||today;fr.onsubmit=async e=>{e.preventDefault();const d={date:$("#rDate").value,project:$("#rProj").value,device:$("#rDev").value.trim(),result:$("#rRes").value.trim(),params:$("#rPar").value.trim(),setup:$("#rSet").value.trim(),file:$("#rFile").value.trim(),createdAt:Date.now()};
+    try{await db.collection("runs").add(d);toast("Measurement added");fr.reset()}catch(err){toast("Could not save: "+(err&&err.message||err))}}}
+  const fm=$("#fMeet");if(fm){$("#mDate").value=$("#mDate").value||today;fm.onsubmit=async e=>{e.preventDefault();const d={date:$("#mDate").value,title:$("#mTitle").value.trim(),who:$("#mWho").value.trim(),slides:$("#mSlides").value.trim(),decisions:$("#mDec").value.trim(),actions:$("#mAct").value.trim(),createdAt:Date.now()};
+    try{await db.collection("meetings").add(d);toast("Meeting added");fm.reset()}catch(err){toast("Could not save: "+(err&&err.message||err))}}}
+  document.querySelectorAll("form.olf").forEach(f=>f.onsubmit=async e=>{e.preventDefault();const u=f.querySelector("input").value.trim();if(u&&!/^https:\/\/(www\.)?overleaf\.com\//.test(u)){toast("Paste a link that starts with https://www.overleaf.com/");return}
+    try{await db.collection("projects").doc(f.dataset.pid).update({overleaf:u});toast(u?"Overleaf link saved":"Overleaf link removed")}catch(err){toast("Could not save: "+(err&&err.message||err))}});
+  document.querySelectorAll("[data-delrun]").forEach(b=>b.onclick=()=>armDel(b,"runs",b.dataset.delrun));
+  document.querySelectorAll("[data-delmeet]").forEach(b=>b.onclick=()=>armDel(b,"meetings",b.dataset.delmeet));
+}
+function armDel(b,c,id){if(b.dataset.armed){db.collection(c).doc(id).delete().then(()=>toast("Deleted")).catch(e=>toast("Could not delete: "+(e&&e.message||e)));return}b.dataset.armed=1;b.textContent="Tap again to delete";setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent="Delete"}},3000)}
+
+window.addEventListener("hashchange",render);
+document.addEventListener("click",e=>{if(e.target.id==="lockBtn"){e.preventDefault();lockOut()}});
+render();
+const CR={k:null};
+const ub=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0)),eb=b=>btoa(String.fromCharCode(...new Uint8Array(b)));
+async function deriveKey(pw,salt,it){const m=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveKey"]);return crypto.subtle.deriveKey({name:"PBKDF2",salt:ub(salt),iterations:it,hash:"SHA-256"},m,{name:"AES-GCM",length:256},false,["encrypt","decrypt"])}
+async function decB(k,b){return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:"AES-GCM",iv:ub(b.iv)},k,ub(b.ct))))}
+async function encB(k,o){const iv=crypto.getRandomValues(new Uint8Array(12));return {iv:eb(iv),ct:eb(await crypto.subtle.encrypt({name:"AES-GCM",iv},k,new TextEncoder().encode(JSON.stringify(o))))}}
+let ENC=null;
+async function unlock(pw,remember){const k=await deriveKey(pw,ENC.kdf.salt,ENC.kdf.iter);const d=await decB(k,ENC);
+  for(const x of ENC.extra||[]){try{const m=await decB(k,x);d.meetings=(d.meetings||[]).filter(y=>y._id!==m._id).concat([m])}catch(e){}}
+  CR.k=k;if(remember){try{localStorage.setItem("lafhub_pw",pw)}catch(e){}}
+  db=true;Object.assign(S,{projects:d.projects,samples:d.samples,runs:d.runs,meetings:d.meetings,talks:d.talks||[],config:d.config,updated:d.updated});
+  document.body.classList.remove("locked");const L=$("#lock");if(L)L.remove();render()}
+function lockScreen(){document.body.classList.add("locked");const L=document.createElement("div");L.id="lock";L.innerHTML=`<form class="lbox" id="lf"><div class="lt">LAF STNO <span>Hub</span></div><p class="note">This page is private. Enter the password.</p>
+  <input type="password" id="lpw" autocomplete="current-password" placeholder="Password" required><label class="note lrem"><input type="checkbox" id="lrm" checked> Remember on this device</label>
+  <button class="btn primary" type="submit">Open</button><div class="lerr" id="lerr"></div></form>`;document.body.appendChild(L);
+  $("#lf").onsubmit=async e=>{e.preventDefault();const b=e.target.querySelector("button");b.disabled=true;b.textContent="Opening…";try{await unlock($("#lpw").value,$("#lrm").checked)}catch(x){$("#lerr").textContent="Wrong password.";b.disabled=false;b.textContent="Open"}};setTimeout(()=>{const i=$("#lpw");if(i)i.focus()},50)}
+function lockOut(){try{localStorage.removeItem("lafhub_pw")}catch(e){}location.reload()}
+fetch("data.enc.json",{cache:"no-store"}).then(r=>r.json()).then(async e=>{ENC=e;let pw="";try{pw=localStorage.getItem("lafhub_pw")||""}catch(x){}
+  if(pw){try{await unlock(pw,false);return}catch(x){try{localStorage.removeItem("lafhub_pw")}catch(y){}}}lockScreen()}).catch(e=>{$("#view").innerHTML='<div class="empty">Could not load the data.</div>'});
+</script>
+<footer class="wrap" style="padding-block:0 32px;color:var(--muted);font-size:13px">Data files live on CNRS sDrive (links need a CNRS login with access to the shared folder). This page is an index, updated by Tan. <a href="#" id="lockBtn">Lock this device</a>.<span id="upd"></span></footer>
+</body></html>
