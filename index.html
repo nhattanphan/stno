@@ -213,6 +213,8 @@ footer.site{padding-block:0 32px;color:var(--muted);font-size:13.5px}
     <a class="tab" href="#measurements" data-v="measurements"><span class="lg">Measurements</span><span class="sm">Data</span><span class="n" id="nR"></span></a>
     <a class="tab" href="#meetings" data-v="meetings">Meetings<span class="n" id="nM"></span></a>
     <a class="tab" href="#talks" data-v="talks">Talks<span class="n" id="nT"></span></a>
+    <a class="tab" href="#learn" data-v="learn">Learn</a>
+    <a class="tab" href="#papers" data-v="papers">Papers<span class="n" id="nP"></span></a>
     <a class="tab" href="#files" data-v="files">Files</a>
   </nav>
 </div></div>
@@ -233,8 +235,8 @@ const STC=[["alive","Alive","--ok"],["untested","Untested","--idle"],["suspect",
 const MT={group:["Group meeting","--navy"],spincom:["SPINCOM","--accent"],collab:["Collaborators","--vio"],other:["Other","--muted"]};
 const TK={oral:["Oral talk","--navy"],invited:["Invited talk","--accent"],poster:["Poster","--vio"],seminar:["Seminar","--ok"]};
 const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-const COLLS=["projects","samples","runs","meetings","talks"];
-const S={base:null,projects:[],samples:[],runs:[],meetings:[],talks:[],config:{},pf:"all",q:"",sf:"all",mf:"all",my:"all",mq:"",tf:"all"};
+const COLLS=["projects","samples","runs","meetings","talks","refs"];
+const S={base:null,projects:[],samples:[],runs:[],meetings:[],talks:[],refs:[],config:{},lf:"all",rf:"all",rq:"",pf:"all",q:"",sf:"all",mf:"all",my:"all",mq:"",tf:"all"};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const link=(u,t)=>u&&/^https?:\/\//.test(u)?`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)}</a>`:"";
@@ -242,7 +244,7 @@ const today=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOStr
 const byDate=(a,b)=>String(b.date||"").localeCompare(String(a.date||""));
 function fmtD(s,noYear){const [y,m,d]=String(s||"").split("-");if(!m)return esc(s||"");return (+d?+d+" ":"")+MON[+m-1]+(noYear&&y==String(new Date().getFullYear())?"":" "+y)}
 function toast(t){const e=document.createElement("div");e.className="toast";e.setAttribute("role","status");e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2600)}
-function view(){const v=(location.hash||"#overview").slice(1).replace(/-.*/,"");return ["overview","samples","measurements","meetings","talks","files"].includes(v)?v:"overview"}
+function view(){const v=(location.hash||"#overview").slice(1).replace(/-.*/,"");return ["overview","samples","measurements","meetings","talks","learn","papers","files"].includes(v)?v:"overview"}
 function drive(k){return (S.config&&S.config[k])||""}
 function myName(){try{return localStorage.getItem("lafhub_name")||""}catch(e){return ""}}
 function setName(n){if(n)try{localStorage.setItem("lafhub_name",n)}catch(e){}}
@@ -263,12 +265,13 @@ function merge(){if(!S.base)return;
 /* ---------- render ---------- */
 function render(){
   const v=view();document.querySelectorAll(".tab").forEach(t=>{if(t.dataset.v===v)t.setAttribute("aria-current","page");else t.removeAttribute("aria-current")});
-  $("#nS").textContent=S.samples.length||"";$("#nR").textContent=S.runs.length||"";$("#nM").textContent=S.meetings.length||"";$("#nT").textContent=S.talks.length||"";
+  $("#nS").textContent=S.samples.length||"";$("#nR").textContent=S.runs.length||"";$("#nM").textContent=S.meetings.length||"";$("#nT").textContent=S.talks.length||"";$("#nP").textContent=S.refs.length||"";
   const ch=$("#chatLink");if(drive("chat"))ch.href=drive("chat");const r=$("#driveRoot");if(drive("root")){r.href=drive("root");r.hidden=false}else r.hidden=true;
   const el=$("#view");if(!S.base){el.innerHTML=`<div class="empty">Loading…</div>`;return}
   const keep={};["chatIn","chatName"].forEach(id=>{const e=document.getElementById(id);if(e)keep[id]=e.value});
   const ae=document.activeElement&&el.contains(document.activeElement)&&document.activeElement.id,sel=ae&&document.activeElement.selectionStart;
-  el.innerHTML=({overview:vOverview,samples:vSamples,measurements:vRuns,meetings:vMeetings,talks:vTalks,files:vFiles})[v]();
+  el.innerHTML=({overview:vOverview,samples:vSamples,measurements:vRuns,meetings:vMeetings,talks:vTalks,learn:vLearn,papers:vPapers,files:vFiles})[v]();
+  if(MOD&&(v==="learn"||v==="papers"))try{MOD.mount(el)}catch(x){}
   for(const[id,val] of Object.entries(keep)){const e=document.getElementById(id);if(e)e.value=val}
   if(ae){const e=document.getElementById(ae);if(e){e.focus();try{if(sel!=null)e.setSelectionRange(sel,sel)}catch(x){}}}
   drawLive()}
@@ -353,12 +356,21 @@ function vTalks(){
   ${L.length?Object.keys(by).sort().reverse().map(y=>`<section><h2 class="yh">${y} <span class="cn">${by[y].length}</span></h2><div class="mlist">${by[y].map(talkCard).join("")}</div></section>`).join(""):`<div class="empty">No talks or posters yet.</div>`}`}
 
 function vFiles(){
-  const F=[["root","Tan_STNO_LAF","Everything below"],["samples","01 · Samples","Sample info, layouts, die maps"],["meas","02 · Measurements","Raw data and quick-look plots, one folder per project"],["ep","EP encirclement","Gain maps, encirclement loops"],["stvo","STVO array","S1–S4 measurements"],["sd","Spin-diode","VB01-23 and SPINTEC/INL dies"],["floq","Floquet","Drive sweeps"],["meet","03 · Meetings","Slides, one folder per meeting"],["papers","04 · Papers","Drafts and figures"],["prb","PRB · Multi-turn EP","Figures and draft"],["code","05 · Code","Pointer to the Git repositories"],["conf","06 · Conferences","Talk slides and posters"]];
+  const F=[["root","Tan_STNO_LAF","Everything below"],["samples","01 · Samples","Sample info, layouts, die maps"],["meas","02 · Measurements","Raw data and quick-look plots, one folder per project"],["ep","EP encirclement","Gain maps, encirclement loops"],["stvo","STVO array","S1–S4 measurements"],["sd","Spin-diode","VB01-23 and SPINTEC/INL dies"],["floq","Floquet","Drive sweeps"],["meet","03 · Meetings","Slides, one folder per meeting"],["papers","04 · Papers","Drafts and figures"],["prb","PRB · Multi-turn EP","Figures and draft"],["code","05 · Code","Pointer to the Git repositories"],["conf","06 · Conferences","Talk slides and posters"],["refs","04 · References","Reference papers (PDF)"]];
   const OL=S.projects.filter(p=>p.overleaf);
   return `<section class="ptitle"><div><h2>Files</h2><p>Shortcuts to the shared sDrive folders (CNRS login) and the paper drafts.</p></div></section>
   ${OL.length?`<section><div class="shead"><h2>Paper writing</h2></div><div class="files">${OL.map(p=>`<a href="${esc(p.overleaf)}" target="_blank" rel="noopener"><b>Overleaf · ${esc(p.name)} ↗</b><span>${esc(p.title)}</span></a>`).join("")}</div></section>`:""}
   <section><div class="shead"><h2>sDrive folders</h2></div><div class="files">${F.filter(([k])=>drive(k)).map(([k,n,d])=>`<a href="${esc(drive(k))}" target="_blank" rel="noopener"><b>${esc(n)} ↗</b><span>${esc(d)}</span></a>`).join("")}</div>
   <p class="note">Naming: measurement folders as <span class="mono">YYYY-MM-DD_sample_device_type</span> (e.g. <span class="mono">2026-11-20_S1_N5_RF</span>) with the raw file, the instrument settings and a quick-look .png.</p></section>`}
+
+/* ---------- Learn & Papers (encrypted module) ---------- */
+let MOD=null,MODerr="";
+const HELP={esc,link,PJ,chipB,editBtn,addBtn,drive:k=>drive(k)};
+function vLearn(){return MOD?MOD.learn(S,S.lf):`<div class="empty">${MODerr||"Loading the Learn section…"}</div>`}
+function vPapers(){return MOD?MOD.papers(S,S.rf,S.rq):`<div class="empty">${MODerr||"Loading the reference library…"}</div>`}
+async function loadLearn(){try{const x=await fetch("learn.enc.json",{cache:"no-store"}).then(r=>r.json());const {js}=await decB(CR.k,x);
+  MOD=new Function("H",js)(HELP);const st=document.createElement("style");st.textContent=MOD.css;document.head.appendChild(st);S.base.refs=MOD.refs;merge();render();
+  if(location.hash.includes("-")){const t=document.getElementById(location.hash.slice(1));if(t)setTimeout(()=>t.scrollIntoView(),50)}}catch(e){MODerr="Could not load this section.";render()}}
 
 /* ---------- editor ---------- */
 const PJO=()=>Object.entries(PJ);
@@ -377,6 +389,9 @@ const FS={
   {k:"project",l:"Project",t:"sel",o:()=>[["","—"]].concat(PJO())},{k:"url",l:"Conference website",t:"url"},{k:"files",l:"Slides or poster link",t:"url",w:1,h:LINKH}]},
  samples:{one:"sample",f:[{k:"name",l:"Name",req:1,w:1,ph:"e.g. VB01-23 · die EN"},{k:"project",l:"Project",t:"sel",o:PJO,req:1},{k:"subtitle",l:"Short description",ph:"wafer, die, stack in a few words"},
   {k:"counts",l:"Devices",t:"counts",w:1},{k:"layout",l:"Layout link",t:"url",w:1},{k:"data",l:"Measurement data link",t:"url",w:1},{k:"drive",l:"Sample info folder link",t:"url",w:1}]},
+ refs:{one:"paper",f:[{k:"title",l:"Title",req:1,w:1},{k:"authors",l:"Authors",w:1,ph:"A. Author, B. Author, …"},{k:"journal",l:"Journal, volume, pages",ph:"e.g. Nature 537, 76"},{k:"year",l:"Year",ph:"2026"},
+  {k:"project",l:"Project",t:"sel",o:()=>[["","—"]].concat(PJO())},{k:"url",l:"DOI or arXiv link",t:"url"},{k:"pdf",l:"PDF on sDrive",t:"url",w:1,h:LINKH},
+  {k:"summary",l:"Main idea (2–3 sentences)",t:"area",w:1},{k:"points",l:"Key points (one per line)",t:"area",w:1},{k:"fig",l:"Figure image link (optional)",t:"url",w:1}]},
  projects:{one:"project",noDel:1,f:[{k:"name",l:"Name",req:1},{k:"stage",l:"Stage",req:1,ph:"e.g. Writing, Running"},{k:"title",l:"Subtitle",w:1},{k:"summary",l:"Summary",t:"area",w:1},
   {k:"overleaf",l:"Overleaf link",t:"url",w:1}]}};
 const ED={coll:null,id:null,orig:null};
@@ -398,7 +413,7 @@ function readEd(){const spec=FS[ED.coll],o={...(ED.orig||{})};delete o._id;delet
     const val=($("#f_"+f.k).value||"").trim();if(val)o[f.k]=val;else delete o[f.k]}
   if(ED.coll==="samples"&&o.order==null)o.order=99;
   return o}
-function newId(coll,o){const base=(coll==="samples"?o.name:(o.date||today())+"_"+(o.device||o.title||o.conf||""))||"item";
+function newId(coll,o){const base=(coll==="samples"||coll==="refs"?(o.title||o.name):(o.date||today())+"_"+(o.device||o.title||o.conf||""))||"item";
   return base.normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-Za-z0-9-]+/g,"_").replace(/^_|_$/g,"").slice(0,60)+"_"+Math.random().toString(36).slice(2,6)}
 async function saveItem(coll,id,payload){if(!LV.on){toast("Not connected yet. Try again in a few seconds.");return false}
   const {setDoc,doc,serverTimestamp}=LV.fs;try{await setDoc(doc(LV.db,"items",coll+"__"+id),{t:serverTimestamp(),...(await encB(CR.k,payload))});return true}catch(e){toast("Could not save. Check the connection.");return false}}
@@ -417,7 +432,7 @@ $("#edDel").addEventListener("click",async e=>{const b=e.currentTarget;if(!b.dat
 document.addEventListener("click",e=>{const c=e.target.closest("[data-f]");if(c){S[c.dataset.f]=c.dataset.val;render();const n=document.querySelector(`[data-f="${c.dataset.f}"][data-val="${CSS.escape(c.dataset.val)}"]`);if(n)n.focus();return}
   const g=e.target.closest("[data-go]");if(g)S[g.dataset.go]=g.dataset.val;
   if(e.target.id==="lockBtn"){e.preventDefault();lockOut()}});
-document.addEventListener("input",e=>{if(e.target.id==="q"){S.q=e.target.value;render()}if(e.target.id==="mq"){S.mq=e.target.value;render()}});
+document.addEventListener("input",e=>{if(e.target.id==="rq"){S.rq=e.target.value;render()}if(e.target.id==="q"){S.q=e.target.value;render()}if(e.target.id==="mq"){S.mq=e.target.value;render()}});
 let lastV=view();window.addEventListener("hashchange",()=>{const v=view();render();if(v!==lastV&&!location.hash.includes("-"))window.scrollTo(0,0);lastV=v;if(location.hash.includes("-")){const t=document.getElementById(location.hash.slice(1));if(t)t.scrollIntoView()}});
 
 /* ---------- live layer (Firebase) ---------- */
@@ -455,8 +470,8 @@ let ENC=null;
 async function unlock(pw,remember){const k=await deriveKey(pw,ENC.kdf.salt,ENC.kdf.iter);const d=await decB(k,ENC);
   for(const x of ENC.extra||[]){try{const m=await decB(k,x);d.meetings=(d.meetings||[]).filter(y=>y._id!==m._id).concat([m])}catch(e){}}
   CR.k=k;if(remember){try{localStorage.setItem("lafhub_pw",pw)}catch(e){}}
-  S.base={projects:d.projects||[],samples:d.samples||[],runs:d.runs||[],meetings:d.meetings||[],talks:d.talks||[]};S.config=d.config||{};merge();
-  document.body.classList.remove("locked");const L=$("#lock");if(L)L.remove();render();startLive(pw)}
+  S.base={projects:d.projects||[],samples:d.samples||[],runs:d.runs||[],meetings:d.meetings||[],talks:d.talks||[],refs:[]};S.config=d.config||{};merge();
+  document.body.classList.remove("locked");const L=$("#lock");if(L)L.remove();render();startLive(pw);loadLearn()}
 function lockScreen(){document.body.classList.add("locked");const L=document.createElement("div");L.id="lock";L.innerHTML=`<form class="lbox" id="lf"><div class="lt">LAF STNO <span>Hub</span></div><p class="note" style="margin:0">This page is private. Enter the password.</p>
   <input type="password" id="lpw" autocomplete="current-password" placeholder="Password" aria-label="Password" required><label class="note lrem"><input type="checkbox" id="lrm" checked> Remember on this device</label>
   <button class="btn primary" type="submit">Open</button><div class="lerr" id="lerr" role="alert"></div></form>`;document.body.appendChild(L);
