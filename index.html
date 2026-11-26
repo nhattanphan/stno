@@ -188,6 +188,27 @@ dl.info dt{color:var(--muted);font-weight:600}dl.info dd{margin:0;min-width:0;ov
 .tsec{border-top:1px solid var(--line);padding-top:26px;display:grid;gap:14px;scroll-margin-top:70px}
 .cline{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}.cline b{color:var(--ink)}
 .feed .ago{font:500 12.5px var(--mono)}
+/* timeline */
+.heat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);overflow-x:auto}
+.heat svg{min-width:760px;width:100%;height:auto;display:block}
+.heat a rect:hover{stroke:#141a33;stroke-width:1.5}
+.hleg{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);margin-top:6px;flex-wrap:wrap}
+.hleg i{width:12px;height:12px;border-radius:3px;display:inline-block}.hleg .hm{border:2px solid #c2185b;margin-left:12px}
+.tlmh{font:800 18px var(--display);margin:8px 0 -4px}
+ol.tl{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+ol.tl>li{display:grid;grid-template-columns:76px 1fr;gap:14px;padding:12px 16px;border-top:1px solid var(--line);scroll-margin-top:76px;transition:background .4s}
+ol.tl>li:first-child{border-top:0}
+ol.tl>li.flash{background:var(--accent-soft)}
+.tld{display:grid;line-height:1.2}.tld b{font:700 15px var(--display)}.tld span{font-size:12.5px;color:var(--muted)}
+.tlb{display:grid;gap:7px;min-width:0}
+.tlrow{display:grid;grid-template-columns:150px 1fr;gap:10px;align-items:start;font-size:14px}
+.tls{font-weight:600;font-size:13px;color:var(--navy);padding-top:3px}.tlm{color:var(--accent)}
+.tlchips{display:flex;flex-wrap:wrap;gap:5px}
+.tlc{display:inline-flex;align-items:baseline;gap:5px;padding:3px 9px;border-radius:999px;background:color-mix(in srgb,var(--c) 16%,#fff);border:1px solid var(--c);color:var(--ink);text-decoration:none;font:600 12.5px var(--mono)}
+.tlc small{font:500 11px var(--body);color:var(--muted)}
+.tlc:hover{background:color-mix(in srgb,var(--c) 30%,#fff);color:var(--ink)}
+@media (max-width:600px){ol.tl>li{grid-template-columns:1fr;gap:6px}.tlrow{grid-template-columns:1fr;gap:3px}}
+
 /* toolbars */
 .tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .chip{border:1px solid var(--line);background:var(--raised);color:var(--ink);border-radius:999px;padding:6px 13px;min-height:36px;font:500 13.5px var(--body);cursor:pointer}
@@ -289,7 +310,7 @@ const MT={group:["Group meeting","--navy"],spincom:["SPINCOM","--accent"],collab
 const TK={oral:["Oral talk","--navy"],invited:["Invited talk","--accent"],poster:["Poster","--vio"],seminar:["Seminar","--ok"]};
 const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const COLLS=["projects","samples","runs","meetings","talks","refs"];
-const S={base:null,projects:[],samples:[],runs:[],meetings:[],talks:[],refs:[],config:{},lf:"all",rf:"all",rq:"",pf:"all",q:"",sf:"all",mf:"all",my:"all",mq:"",tf:"all"};
+const S={tlf:"all",tly:"",base:null,projects:[],samples:[],runs:[],meetings:[],talks:[],refs:[],config:{},lf:"all",rf:"all",rq:"",pf:"all",q:"",sf:"all",mf:"all",my:"all",mq:"",tf:"all"};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const link=(u,t)=>u&&/^https?:\/\//.test(u)?`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)}</a>`:"";
@@ -297,7 +318,7 @@ const today=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOStr
 const byDate=(a,b)=>String(b.date||"").localeCompare(String(a.date||""));
 function fmtD(s,noYear){const [y,m,d]=String(s||"").split("-");if(!m)return esc(s||"");return (+d?+d+" ":"")+MON[+m-1]+(noYear&&y==String(new Date().getFullYear())?"":" "+y)}
 function toast(t){const e=document.createElement("div");e.className="toast";e.setAttribute("role","status");e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2600)}
-function view(){const v=(location.hash||"#overview").slice(1).replace(/-.*/,"");return ["overview","samples","die","meetings","talks","learn","papers","files"].includes(v)?v:"overview"}
+function view(){const v=(location.hash||"#overview").slice(1).replace(/-.*/,"");return ["overview","samples","die","timeline","meetings","talks","learn","papers","files"].includes(v)?v:"overview"}
 function drive(k){return (S.config&&S.config[k])||""}
 function myName(){try{return localStorage.getItem("lafhub_name")||""}catch(e){return ""}}
 function setName(n){if(n)try{localStorage.setItem("lafhub_name",n)}catch(e){}}
@@ -317,13 +338,13 @@ function merge(){if(!S.base)return;
 
 /* ---------- render ---------- */
 function render(){
-  const v=view();document.querySelectorAll(".tab").forEach(t=>{if(t.dataset.v===(v==="die"?"samples":v==="talks"?"meetings":v))t.setAttribute("aria-current","page");else t.removeAttribute("aria-current")});
+  const v=view();document.querySelectorAll(".tab").forEach(t=>{if(t.dataset.v===(v==="die"||v==="timeline"?"samples":v==="talks"?"meetings":v))t.setAttribute("aria-current","page");else t.removeAttribute("aria-current")});
   $("#nS").textContent=S.samples.length||"";$("#nM").textContent=S.meetings.length||"";$("#nP").textContent=S.refs.length||"";
   const ch=$("#chatLink");if(drive("chat"))ch.href=drive("chat");const r=$("#driveRoot");if(drive("root")){r.href=drive("root");r.hidden=false}else r.hidden=true;
   const el=$("#view");if(!S.base){el.innerHTML=`<div class="empty">Loading…</div>`;return}
   const keep={};["chatIn","chatName","dvNote","dvSt"].forEach(id=>{const e=document.getElementById(id);if(e)keep[id]=e.value});
   const ae=document.activeElement&&el.contains(document.activeElement)&&document.activeElement.id,sel=ae&&document.activeElement.selectionStart;
-  el.innerHTML=({overview:vOverview,samples:vSamples,die:vDie,meetings:vMeetings,talks:vMeetings,learn:vLearn,papers:vPapers,files:vFiles})[v]();
+  el.innerHTML=({overview:vOverview,samples:vSamples,die:vDie,timeline:vTimeline,meetings:vMeetings,talks:vMeetings,learn:vLearn,papers:vPapers,files:vFiles})[v]();
   if(MOD&&(v==="learn"||v==="papers"))try{MOD.mount(el)}catch(x){}
   for(const[id,val] of Object.entries(keep)){const e=document.getElementById(id);if(e)e.value=val}
   if(ae){const e=document.getElementById(ae);if(e){e.focus();try{if(sel!=null)e.setSelectionRange(sel,sel)}catch(x){}}}
@@ -347,7 +368,7 @@ function vOverview(){
   const act=ev.filter(e=>isFinite(e.ms)&&e.ms<=Date.now()+864e5).sort((a,b)=>b.ms-a.ms).slice(0,8);
   const when=ms=>Date.now()-ms<6*864e5?ago(ms):fmtD(new Date(ms-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10),1);
   return `<section id="overview-projects"><div class="shead"><h2>Projects</h2></div><div class="grid pgrid">${P.map(projCard).join("")}</div></section>
-  <section><div class="shead"><h2>What's new</h2><span class="note">device updates, meetings, talks, papers and sDrive files</span></div>
+  <section><div class="shead"><h2>What's new</h2><a href="#timeline" class="note">Full timeline: what was measured each day →</a></div>
    ${act.length?`<ol class="feed">${act.map(a=>`<li><time class="ago">${esc(when(a.ms))}</time><span class="dot" style="--c:var(${a.c})" aria-hidden="true"></span><div><div class="t"><a href="${a.h}"${a.dsel?` data-dsel="${esc(a.dsel)}"`:""}>${esc(a.k)} · ${esc(a.t)}</a></div>${a.s?`<div class="s">${esc(a.s)}</div>`:""}</div>${a.u&&/^https?:/.test(a.u)?`<a class="btn sm" href="${esc(a.u)}" target="_blank" rel="noopener">Open ↗</a>`:"<span></span>"}</li>`).join("")}</ol>`:`<div class="empty">Nothing new yet.</div>`}</section>
   <section class="help"><h3>How to use this hub</h3><ol>
    <li><b>Samples:</b> open a die to see its layout; click any device for its status and its measurement files on sDrive.</li>
@@ -370,7 +391,7 @@ let DEV=null;
 const STL={alive:"Alive",untested:"Untested",suspect:"Suspect",dead:"Dead",measdead:"Died in measurement",short:"Short",open:"Open",skip:"Not used (C-state)"};
 const STV={alive:"--ok",untested:"--idle",suspect:"--warn",dead:"--bad",measdead:"--bad2",short:"--vio",open:"--open",skip:"--skip"};
 async function loadDev(){try{const x=await fetch("devices.enc.json",{cache:"no-store"}).then(r=>r.json());DEV=await decB(CR.k,x);
-  try{const r=await fetch("scan.enc.json",{cache:"no-store"});if(r.ok){const sc=await decB(CR.k,await r.json());if(sc&&sc.files){DEV.files=sc.files;DEV.scanned=sc.scanned}}}catch(e){}render()}catch(e){DEV={maps:{},files:{},err:1};render()}}
+  try{const r=await fetch("scan.enc.json",{cache:"no-store"});if(r.ok){const sc=await decB(CR.k,await r.json());if(sc&&sc.files){DEV.files=sc.files;DEV.scanned=sc.scanned;if(sc.days)DEV.days=sc.days;if(sc.pdays)DEV.pdays=sc.pdays}}}catch(e){}render()}catch(e){DEV={maps:{},files:{},err:1};render()}}
 function devGet(sid,name){const m=DEV&&DEV.maps[sid];if(!m)return null;const b=m.dev[name];const it=LV.items["dev__"+sid+"__"+name];
   if(!it||it.del)return b;return {...(b||{}),...it.item,_by:it.by,_t:it.t}}
 function devNames(sid){const m=DEV&&DEV.maps[sid];if(!m)return [];const n=new Set(Object.keys(m.dev));for(const k of Object.keys(LV.items))if(k.startsWith("dev__"+sid+"__"))n.add(k.slice(7+sid.length));return [...n]}
@@ -395,9 +416,52 @@ function cardBar(c,t){if(!t)return "";const parts=STC.map(([k,,v])=>[k,c[k]||0,v
 function sbar(c,t){return bar(c,t||1)}
 const RESCAN="https://github.com/nhattanphan/stno/issues/new?title="+encodeURIComponent("Rescan sDrive")+"&body="+encodeURIComponent("Started from the hub. Just press Create / Submit; the scan takes about 2 minutes, then reload the hub.");
 const rescanBtn=()=>`<a class="btn" href="${RESCAN}" target="_blank" rel="noopener" title="Re-reads sDrive › 02_Measurements (runs by itself every night; needs Tan's GitHub account)">↻ Rescan sDrive</a>`;
+/* ---------- Timeline: what was measured on which day ---------- */
+const isoOf=ms=>new Date(ms-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const WD=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+function tlEvents(){const D={},add=(d,e)=>{if(!/^\d{4}-\d\d-\d\d$/.test(d||""))return;(D[d]=D[d]||[]).push(e)};const pj=sid=>((S.samples.find(x=>x._id===sid)||{}).project)||"";
+  if(DEV&&DEV.days)for(const [sid,devs] of Object.entries(DEV.days))for(const [n,dd] of Object.entries(devs))for(const [iso,c] of Object.entries(dd))add(iso,{k:"dev",sid,n,c,p:pj(sid)});
+  if(DEV&&DEV.pdays)for(const [p,dd] of Object.entries(DEV.pdays))for(const [iso,c] of Object.entries(dd))add(iso,{k:"proj",p,c});
+  S.meetings.forEach(m=>add(m.date,{k:"meet",m,p:""}));S.talks.forEach(t=>add(t.date,{k:"talk",t,p:t.project||""}));
+  for(const it of Object.values(LV.items)){if(it.coll!=="dev"||!it.t||!it.item)continue;const i=it.id.indexOf("__"),sid=it.id.slice(0,i);add(isoOf(it.t),{k:"st",sid,n:it.id.slice(i+2),st:it.item.st,note:it.item.note,by:it.by,p:pj(sid)})}
+  return D}
+function vTimeline(){
+  if(!DEV)return `<div class="empty">Loading the timeline…</div>`;
+  const all=tlEvents(),f=S.tlf||"all",keep=e=>f==="all"||e.p===f||(e.k==="meet"&&f==="all");
+  const D={};for(const [d,es] of Object.entries(all)){const k=es.filter(keep);if(k.length)D[d]=k}
+  const years=[...new Set(Object.keys(all).map(d=>d.slice(0,4)))].sort().reverse();const yr=S.tly&&years.includes(S.tly)?S.tly:(years[0]||String(new Date().getFullYear()));
+  const days=Object.keys(D).filter(d=>d.startsWith(yr)).sort().reverse();
+  const nDev=d=>new Set((D[d]||[]).filter(e=>e.k==="dev"||e.k==="proj").map(e=>e.k==="dev"?e.sid+e.n:e.p)).size;
+  /* heatmap */
+  const start=new Date(+yr,0,1),off=(start.getDay()+6)%7,cs=13,gp=3;let cells="",mlab="";
+  for(let i=0;i<366;i++){const dt=new Date(+yr,0,1+i);if(dt.getFullYear()!==+yr)break;const iso=isoOf(dt.getTime()+12*36e5),k=i+off,col=Math.floor(k/7),row=k%7,n=nDev(iso),meet=(D[iso]||[]).some(e=>e.k==="meet"||e.k==="talk");
+    const fill=n?(n>=6?"#1d2a6b":n>=3?"#3f53b5":n>=2?"#7f8fd8":"#b7c1ee"):"#e3e6ef";
+    cells+=`<a href="#tl-${iso}" data-tlday="${iso}"><rect x="${30+col*(cs+gp)}" y="${18+row*(cs+gp)}" width="${cs}" height="${cs}" rx="3" fill="${fill}"${meet?` stroke="#c2185b" stroke-width="2"`:""}><title>${iso}${n?` · ${n} device${n>1?"s":""} measured`:""}${meet?" · meeting/talk":""}</title></rect></a>`;
+    if(dt.getDate()===1)mlab+=`<text x="${30+col*(cs+gp)}" y="11" font-size="10.5" fill="#4f5778">${MON[dt.getMonth()]}</text>`}
+  const W=30+54*(cs+gp),Hh=18+7*(cs+gp);
+  const heat=`<div class="heat"><svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Measurement days in ${yr}">${mlab}${["Mon","","Wed","","Fri","",""].map((l,i)=>l?`<text x="0" y="${18+i*(cs+gp)+10}" font-size="10" fill="#737a99">${l}</text>`:"").join("")}${cells}</svg>
+    <div class="hleg"><span>fewer</span>${["#e3e6ef","#b7c1ee","#7f8fd8","#3f53b5","#1d2a6b"].map(c=>`<i style="background:${c}"></i>`).join("")}<span>more devices measured</span><i class="hm"></i><span>meeting / talk</span></div></div>`;
+  /* list */
+  const sname=sid=>{const s=S.samples.find(x=>x._id===sid);return s?s.name:sid};
+  const dayHTML=d=>{const es=D[d],dt=new Date(d+"T12:00");const g={};es.filter(e=>e.k==="dev").forEach(e=>(g[e.sid]=g[e.sid]||[]).push(e));
+    const parts=[];
+    for(const [sid,arr] of Object.entries(g))parts.push(`<div class="tlrow"><span class="tls">${esc(sname(sid))}</span><span class="tlchips">${arr.sort((a,b)=>a.n.localeCompare(b.n,undefined,{numeric:true})).map(e=>{const st=(devGet(sid,e.n)||{}).st||"untested";return `<a class="tlc" href="#die-${esc(sid)}" data-dsel="${esc(sid+"|"+e.n)}" style="--c:var(${STV[st]||"--idle"})" title="${esc(STL[st]||st)}">${esc(e.n)}<small>${e.c} file${e.c>1?"s":""}</small></a>`}).join("")}</span></div>`);
+    es.filter(e=>e.k==="proj").forEach(e=>parts.push(`<div class="tlrow"><span class="tls">${esc(PJ[e.p]||e.p)}</span><span class="note">${e.c} file${e.c>1?"s":""} on sDrive</span></div>`));
+    es.filter(e=>e.k==="st").forEach(e=>parts.push(`<div class="tlrow"><span class="tls">Status</span><span><a href="#die-${esc(e.sid)}" data-dsel="${esc(e.sid+"|"+e.n)}">${esc(e.n)} · ${esc(sname(e.sid))}</a> → <b>${esc(STL[e.st]||e.st)}</b>${e.note?` <span class="note">${esc(e.note)}</span>`:""}${e.by?` <span class="note">· ${esc(e.by)}</span>`:""}</span></div>`));
+    es.filter(e=>e.k==="meet").forEach(e=>parts.push(`<div class="tlrow"><span class="tls tlm">Meeting</span><span><a href="#meetings">${esc(e.m.title)}</a>${e.m.slides?` · ${link(e.m.slides,"slides ↗")}`:""}</span></div>`));
+    es.filter(e=>e.k==="talk").forEach(e=>parts.push(`<div class="tlrow"><span class="tls tlm">${esc((TK[e.t.kind]||[e.t.kind])[0])}</span><span><a href="#talks">${esc(e.t.title)}</a> <span class="note">${esc(e.t.conf||"")}</span></span></div>`));
+    return `<li id="tl-${d}"><div class="tld"><b>${dt.getDate()} ${MON[dt.getMonth()]}</b><span>${WD[dt.getDay()]}</span></div><div class="tlb">${parts.join("")}</div></li>`};
+  let list="",lastM="";for(const d of days){const m=d.slice(0,7);if(m!==lastM){list+=`${lastM?"</ol>":""}<h3 class="tlmh">${MON[+m.slice(5)-1]} ${m.slice(0,4)}</h3><ol class="tl">`;lastM=m}list+=dayHTML(d)}if(lastM)list+="</ol>";
+  const nd=days.filter(d=>nDev(d)).length;
+  return `<section class="ptitle"><div><h2>Timeline</h2><p>What was measured on which day, from the files in sDrive › 02_Measurements (file-name date, else upload date), plus meetings, talks and device status changes.</p></div><a class="btn ghost" href="#samples">← Samples</a></section>
+  <div class="tools">${chipB("tlf","all","All projects")}${Object.entries(PJ).map(([k,n])=>chipB("tlf",k,n)).join("")}</div>
+  <div class="tools">${years.map(y=>`<button type="button" class="chip" data-f="tly" data-val="${y}" aria-pressed="${y===yr}">${y}</button>`).join("")}<span class="note">${nd} measurement day${nd===1?"":"s"} in ${yr}</span></div>
+  ${heat}${days.length?list:`<div class="empty">Nothing recorded in ${yr} for this filter.</div>`}`}
+document.addEventListener("click",e=>{const a=e.target.closest("[data-tlday]");if(!a)return;e.preventDefault();const t=document.getElementById("tl-"+a.dataset.tlday);if(t){t.scrollIntoView({behavior:"smooth",block:"start"});t.classList.add("flash");setTimeout(()=>t.classList.remove("flash"),1400)}else toast("Nothing recorded that day")});
+
 function vSamples(){
   const L=S.samples.filter(s=>S.sf==="all"||s.project===S.sf).sort((a,b)=>(a.order||99)-(b.order||99));
-  return `<section class="ptitle"><div><h2>Samples<span class="cn">${S.samples.length}</span></h2><p>One card per die. Open a die to see its layout; click a device for its status and its measurement files on sDrive.${DEV&&DEV.scanned?` File list from sDrive updated ${esc(fmtD(DEV.scanned))}; it refreshes every night.`:""}</p></div><div class="row">${rescanBtn()}${addBtn("samples","Add a sample")}</div></section>
+  return `<section class="ptitle"><div><h2>Samples<span class="cn">${S.samples.length}</span></h2><p>One card per die. Open a die to see its layout; click a device for its status and its measurement files on sDrive.${DEV&&DEV.scanned?` File list from sDrive updated ${esc(fmtD(DEV.scanned))}; it refreshes every night.`:""}</p></div><div class="row"><a class="btn" href="#timeline">📅 Timeline</a>${rescanBtn()}${addBtn("samples","Add a sample")}</div></section>
   <div class="tools">${pjChips("sf")}</div>
   ${L.length?`<div class="dgrid">${L.map(s=>{const {c,t}=sampleCounts(s);const has=DEV&&DEV.maps[s._id];const nf=Object.keys((DEV&&DEV.files[s._id])||{}).length;
    return `<article class="card dcard">${editBtn("samples",s._id,s.name)}<a class="dlink" href="#die-${esc(s._id)}" aria-label="Open ${esc(s.name)}">
