@@ -171,7 +171,7 @@ dl.info dt{color:var(--muted);font-weight:600}dl.info dd{margin:0;min-width:0;ov
 .dv[style*="--idle"] .pl,.dv[style*="--skip"] .pl{fill:#4f5778}
 .dv[style*="--skip"] .pl{fill:#9aa1bd}
 .dv .pn{position:absolute;left:2px;bottom:0;font:700 9px var(--mono);color:inherit;opacity:.85}
-.dmap.cfg .dv{min-height:46px}
+.dmap.cfg .dv,.dmap.cfg>.dnone{min-height:var(--cs);height:var(--cs)}.dmap.cfg .dv .pn{font-size:8px}
 .dlist{display:flex;flex-wrap:wrap;gap:8px}
 .dv.big{min-height:40px;padding:6px 12px}
 .dpanel{gap:12px}
@@ -377,6 +377,7 @@ function miniMap(sid){const m=DEV&&DEV.maps[sid];if(!m||m.list)return "";const g
     if(g.sub){const rs=rowSubs(m,g,r),w=(cw-(rs.length-1))/rs.length;rs.forEach((j,k)=>{const n=cell[j];if(!n)return;const d=devGet(sid,n);out+=`<rect x="${X+k*(w+1)}" y="${Y}" width="${w}" height="${u}" fill="var(${STV[d.st]||"--idle"})"/>`})}
     else{const n=cell._;if(!n)return;const d=devGet(sid,n);out+=`<rect x="${X}" y="${Y}" width="${cw}" height="${cw}" rx="1" fill="var(${STV[d.st]||"--idle"})"/>`}}));
   const W=g.cols.length*(cw+gap),Hh=g.rows.length*(ch+gap);return `<svg class="mini" viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${out}</svg>`}
+let rsT;window.addEventListener("resize",()=>{clearTimeout(rsT);rsT=setTimeout(()=>{if(view()==="die")render()},200)});
 function sbar(c,t){return bar(c,t||1)}
 const RESCAN="https://github.com/nhattanphan/stno/issues/new?title="+encodeURIComponent("Rescan sDrive")+"&body="+encodeURIComponent("Started from the hub. Just press Create / Submit; the scan takes about 2 minutes, then reload the hub.");
 const rescanBtn=()=>`<a class="btn" href="${RESCAN}" target="_blank" rel="noopener" title="Re-reads sDrive › 02_Measurements (runs by itself every night; needs Tan's GitHub account)">↻ Rescan sDrive</a>`;
@@ -398,8 +399,8 @@ function vDie(){const sid=(location.hash.match(/^#die-(.+)$/)||[])[1];const s=S.
   const leg=`<div class="dleg" role="group" aria-label="Highlight devices by status">${Object.entries(STL).filter(([k])=>k==="skip"?Object.values((m||{}).dev||{}).some(d=>d.st==="skip"):c[k]).map(([k,l])=>`<button type="button" class="chip lchip" data-hl="${k}" aria-pressed="${hl===k}"><b style="background:var(${STV[k]})"></b>${esc(l)}${k!=="skip"?` <span class="cn">${c[k]||0}</span>`:""}</button>`).join("")}<span class="note lf"><i class="fdot"></i> has files on sDrive</span></div>`;
   let mapHTML="";
   if(!m||m.list){const names=devNames(sid);mapHTML=`<div class="dlist">${names.length?names.map(n=>devBtn(sid,n,sel,hl,1)).join(""):`<div class="empty">No device list for this sample yet.</div>`}</div>`}
-  else{const g=geo(m);const hasCfg=Object.values(m.dev).some(d=>d.cfg);const cw=g.sub?0:hasCfg?46:(g.cols.length>12?30:38);
-    mapHTML=`<div class="dscroll"><div class="dmap${g.sub?" hasub":""}${hasCfg?" cfg":""}" style="grid-template-columns:auto repeat(${g.cols.length},${g.sub?"minmax(92px,1fr)":cw+"px"})">
+  else{const g=geo(m);const hasCfg=Object.values(m.dev).some(d=>d.cfg);const cs=Math.max(24,Math.min(46,Math.floor((innerHeight-200)/(g.rows.length+1))-4));const cw=g.sub?0:hasCfg?cs:(g.cols.length>12?30:38);
+    mapHTML=`<div class="dscroll"${hasCfg?' style="max-height:none"':""}><div class="dmap${g.sub?" hasub":""}${hasCfg?" cfg":""}" style="--cs:${cw}px;grid-template-columns:auto repeat(${g.cols.length},${g.sub?"minmax(92px,1fr)":cw+"px"})">
      <div class="dcorner">${g.tr?"":""}</div>${g.cols.map(cn=>{const info=g.tr?((m.rowInfo||{})[cn]||""):((m.colInfo||{})[cn]||"");return `<div class="dch">${esc(cn)}${info?`<small>${esc(info)}</small>`:""}</div>`}).join("")}
      ${g.rows.map(r=>{const ri=g.tr?((m.colInfo||{})[r]||""):((m.rowInfo||{})[r]||"");return `<div class="drh">${esc(r)}${ri?`<small>${esc(ri)}</small>`:""}</div>`+g.cols.map(cc=>{const cell=cellOf(m,g,r,cc);
        if(g.sub){const rs=rowSubs(m,g,r);return `<div class="dcell" style="grid-template-columns:repeat(${rs.length||1},1fr)">${rs.map(j=>cell[j]?devBtn(sid,cell[j],sel,hl):`<span class="dnone"></span>`).join("")}</div>`}
