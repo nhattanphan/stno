@@ -214,47 +214,6 @@ ol.tl>li.flash{background:var(--accent-soft)}
 .libnav a small{font:400 12.5px var(--body);color:var(--muted)}
 .libnav a:hover{background:var(--navy-soft);color:var(--ink)}
 .libnav a[aria-current="page"]{background:var(--navy);color:#fff}.libnav a[aria-current="page"] small{color:rgba(255,255,255,.75)}
-/* writing */
-.wstart,.wbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.wsel{width:auto;min-width:200px}
-.wtoc{display:flex;flex-wrap:wrap;gap:6px}
-.wtoc a{font-size:13.5px;text-decoration:none;color:var(--ink);background:var(--raised);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
-.wtoc a:hover{border-color:var(--navy)}
-.wlk{font:600 12px var(--body);color:#fff;background:var(--warn);border-radius:999px;padding:2px 8px}
-.wnc{font-size:12px;color:var(--accent)}.wup{font:700 11px var(--body);color:var(--accent);text-transform:uppercase;letter-spacing:.04em}
-.wdoc{display:grid;gap:14px}
-.wsec{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);scroll-margin-top:76px;min-width:0}
-.wsec.wnew{border-left:4px solid var(--accent)}
-.wsh{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:flex-start;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--surface);border-radius:12px 12px 0 0;position:sticky;top:60px;z-index:2}
-.wsh h3{font:700 19px var(--display);margin:0}
-.wsh .btn[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
-.wbody{padding:16px 22px 18px;font:16px/1.7 "Source Serif 4",Georgia,"Times New Roman",serif;color:#1d2133;max-width:860px;overflow-wrap:break-word}
-.wbody p{margin:0 0 .8em}.wbody .psh{font:700 16px var(--display);margin:1em 0 .4em}
-.wraw{padding:10px 18px}
-.pmath{overflow-x:auto;margin:.4em 0 .9em}
-.pfig{margin:.6em 0 1em;border:1px dashed #c4cbe0;border-radius:10px;padding:10px 12px;background:var(--surface)}.pfig-ph{font:600 13px var(--mono);color:var(--muted)}.pfig figcaption{font:14px/1.5 var(--body);color:var(--ink);margin-top:4px}
-.pcite{color:var(--navy);font-size:.9em}.pref{color:var(--navy)}.pabs{background:var(--surface);border-radius:8px;padding:10px 14px;margin-bottom:1em}.ptitl{font-size:1.3em;font-weight:700}
-.wedit{padding:14px 18px;display:grid;gap:10px}
-.wtitle{font:700 17px var(--display)}
-.wsplit{display:grid;grid-template-columns:1fr 1fr;gap:12px;min-height:280px}
-.wsplit textarea{font:13.5px/1.55 var(--mono);min-height:280px;resize:vertical;tab-size:2}
-.wprev{border:1px solid var(--line);border-radius:10px;padding:12px 16px;overflow:auto;max-height:70vh;font:15px/1.65 "Source Serif 4",Georgia,serif;background:#fffefb}
-.wprev p{margin:0 0 .7em}
-@media (max-width:900px){.wsplit{grid-template-columns:1fr}.wprev{max-height:none}.wsh{position:static}}
-.wedit .sp{flex:1}
-.wpanel{border-top:1px solid var(--line);padding:12px 18px 16px;display:grid;gap:10px;background:var(--surface);border-radius:0 0 12px 12px}
-.wpanel h4{margin:0;font:700 14px var(--body)}
-.wcom{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 12px;display:grid;gap:4px}
-.wcom.done{opacity:.55}
-.wcom blockquote{margin:0;border-left:3px solid var(--accent);padding:2px 8px;font:13px var(--mono);color:var(--muted);white-space:pre-wrap}
-.wcf{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}
-.whist{margin:0;padding-left:18px;display:grid;gap:3px;font-size:14px}
-.linkb{background:none;border:0;color:var(--navy);text-decoration:underline;cursor:pointer;font:inherit;padding:0}
-.wdiff{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:grid;gap:8px}
-.wdiff .sp{flex:1}
-.wdtxt{font:13.5px/1.6 var(--mono);white-space:pre-wrap;max-height:50vh;overflow:auto}
-.wdtxt ins{background:#d7f3df;text-decoration:none;color:#14532d}.wdtxt del{background:#fde0de;color:#8a1c12}
-
 /* toolbars */
 .tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .chip{border:1px solid var(--line);background:var(--raised);color:var(--ink);border-radius:999px;padding:6px 13px;min-height:36px;font:500 13.5px var(--body);cursor:pointer}
@@ -334,7 +293,6 @@ footer.site{padding-block:0 32px;color:var(--muted);font-size:13.5px}
     <a class="tab" href="#overview" data-v="overview">Overview</a>
     <a class="tab" href="#samples" data-v="samples">Samples<span class="n" id="nS"></span></a>
     <a class="tab" href="#timeline" data-v="timeline">Timeline</a>
-    <a class="tab" href="#writing" data-v="writing">Writing</a>
     <a class="tab" href="#meetings" data-v="meetings"><span class="lg">Meetings & talks</span><span class="sm">Meetings</span><span class="n" id="nM"></span></a>
     <a class="tab" href="#learn" data-v="library">Library<span class="n" id="nP"></span></a>
   </nav>
@@ -365,7 +323,7 @@ const today=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOStr
 const byDate=(a,b)=>String(b.date||"").localeCompare(String(a.date||""));
 function fmtD(s,noYear){const [y,m,d]=String(s||"").split("-");if(!m)return esc(s||"");return (+d?+d+" ":"")+MON[+m-1]+(noYear&&y==String(new Date().getFullYear())?"":" "+y)}
 function toast(t){const e=document.createElement("div");e.className="toast";e.setAttribute("role","status");e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2600)}
-function view(){const v=(location.hash||"#overview").slice(1).replace(/-.*/,"");return ["overview","samples","die","timeline","writing","meetings","talks","learn","papers","files"].includes(v)?v:"overview"}
+function view(){const v=(location.hash||"#overview").slice(1).replace(/-.*/,"");return ["overview","samples","die","timeline","meetings","talks","learn","papers","files"].includes(v)?v:"overview"}
 function drive(k){return (S.config&&S.config[k])||""}
 function myName(){try{return localStorage.getItem("lafhub_name")||""}catch(e){return ""}}
 function setName(n){if(n)try{localStorage.setItem("lafhub_name",n)}catch(e){}}
@@ -384,18 +342,17 @@ function merge(){if(!S.base)return;
     S[c]=arr}}
 
 /* ---------- render ---------- */
-function render(){if(typeof W!=="undefined"&&W.edit)wSnap();
+function render(){
   const v=view();document.querySelectorAll(".tab").forEach(t=>{if(t.dataset.v===(v==="die"?"samples":v==="talks"?"meetings":v==="learn"||v==="papers"?"library":v))t.setAttribute("aria-current","page");else t.removeAttribute("aria-current")});
   $("#nS").textContent=S.samples.length||"";$("#nM").textContent=S.meetings.length||"";$("#nP").textContent=S.refs.length||"";
   const ch=$("#chatLink");if(drive("chat"))ch.href=drive("chat");const r=$("#driveRoot");if(drive("root")){r.href=drive("root");r.hidden=false}else r.hidden=true;
   const el=$("#view");if(!S.base){el.innerHTML=`<div class="empty">Loading…</div>`;return}
   const keep={};["chatIn","chatName","dvNote","dvSt"].forEach(id=>{const e=document.getElementById(id);if(e)keep[id]=e.value});
   const ae=document.activeElement&&el.contains(document.activeElement)&&document.activeElement.id,sel=ae&&document.activeElement.selectionStart;
-  el.innerHTML=({overview:vOverview,samples:vSamples,die:vDie,timeline:vTimeline,writing:vWriting,meetings:vMeetings,talks:vMeetings,learn:vLearn,papers:vPapers,files:vFiles})[v]();
+  el.innerHTML=({overview:vOverview,samples:vSamples,die:vDie,timeline:vTimeline,meetings:vMeetings,talks:vMeetings,learn:vLearn,papers:vPapers,files:vFiles})[v]();
   if(MOD&&(v==="learn"||v==="papers"))try{MOD.mount(el)}catch(x){}
   for(const[id,val] of Object.entries(keep)){const e=document.getElementById(id);if(e)e.value=val}
   if(ae){const e=document.getElementById(ae);if(e){e.focus();try{if(sel!=null)e.setSelectionRange(sel,sel)}catch(x){}}}
-  if(v==="writing")wAfter();
   if(v==="talks"){const t=document.getElementById("talks-sec");if(t)setTimeout(()=>t.scrollIntoView(),0)}
   drawLive()}
 
@@ -464,132 +421,6 @@ function cardBar(c,t){if(!t)return "";const parts=STC.map(([k,,v])=>[k,c[k]||0,v
 function sbar(c,t){return bar(c,t||1)}
 const RESCAN="https://github.com/nhattanphan/stno/issues/new?title="+encodeURIComponent("Rescan sDrive")+"&body="+encodeURIComponent("Started from the hub. Just press Create / Submit; the scan takes about 2 minutes, then reload the hub.");
 const rescanBtn=()=>`<a class="btn" href="${RESCAN}" target="_blank" rel="noopener" title="Re-reads sDrive › 02_Measurements (runs by itself every night; needs Tan's GitHub account)">↻ Rescan sDrive</a>`;
-/* ---------- Writing: shared LaTeX drafting, section by section ---------- */
-const W={paper:null,edit:null,open:{},hist:{},lockT:null,seen:{}};
-try{W.seen=JSON.parse(localStorage.getItem("lafhub_seen")||"{}")}catch(e){}
-const PW={docs:{},com:{},lock:{}};
-function wSubscribe(fs){
-  const dec=async(snap,key)=>{const o={};for(const d of snap.docs){const x=d.data();try{o[d.id]={t:tms(x),...(await decB(CR.k,x))}}catch(e){}}PW[key]=o;if(view()==="writing")wRender()};
-  fs.onSnapshot(fs.collection(LV.db,"pdoc"),s=>dec(s,"docs"),()=>{});
-  fs.onSnapshot(fs.collection(LV.db,"pcom"),s=>dec(s,"com"),()=>{});
-  fs.onSnapshot(fs.collection(LV.db,"plock"),s=>dec(s,"lock"),()=>{})}
-async function wPut(col,id,obj){if(!LV.on){toast("Not connected yet. Try again in a few seconds.");return false}
-  const {setDoc,doc,serverTimestamp}=LV.fs;try{await setDoc(doc(LV.db,col,id),{t:serverTimestamp(),...(await encB(CR.k,obj))});return true}catch(e){console.error(e);toast("Could not save ("+(e.code||"error")+")");return false}}
-const wPapers=()=>Object.values(PW.docs).filter(d=>d.type==="paper"&&!d.del).sort((a,b)=>(a.created||0)-(b.created||0));
-const wSecs=p=>Object.values(PW.docs).filter(d=>d.type==="sec"&&d.paper===p&&!d.del).sort((a,b)=>(a.order||0)-(b.order||0));
-const wWords=s=>(String(s||"").replace(/%.*$/gm,"").replace(/\\[a-zA-Z]+\*?(\[[^\]]*\])?/g," ").replace(/\$[^$]*\$/g," x ").match(/[A-Za-zÀ-ÿ0-9]+/g)||[]).length;
-const wLock=(p,s)=>{const l=PW.lock[p+"__"+s];return l&&l.until>Date.now()&&l.by!==myName()?l:null};
-const wid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-
-/* --- tiny LaTeX → HTML for the preview --- */
-function tex2html(src){
-  let t=String(src||"").replace(/(^|[^\\])%.*$/gm,"$1");const M=[];const keep=h=>{M.push(h);return `\u0000${M.length-1}\u0000`};
-  const disp=m=>keep(`<div class="pmath">\\[${esc(m)}\\]</div>`);
-  t=t.replace(/\\begin\{(equation|align|gather|multline|eqnarray)(\*?)\}([\s\S]*?)\\end\{\1\2\}/g,(_,e,st,b)=>{b=b.replace(/\\label\{[^}]*\}/g,"").replace(/\\nonumber|\\notag/g,"");return disp(/align|eqnarray/.test(e)?`\\begin{aligned}${b}\\end{aligned}`:/gather/.test(e)?`\\begin{gathered}${b}\\end{gathered}`:b)});
-  t=t.replace(/\\\[([\s\S]*?)\\\]/g,(_,b)=>disp(b)).replace(/\$\$([\s\S]*?)\$\$/g,(_,b)=>disp(b));
-  t=t.replace(/\\begin\{(figure|table)\*?\}([\s\S]*?)\\end\{\1\*?\}/g,(_,k,b)=>{const cap=(b.match(/\\caption\{([\s\S]*?)\}\s*(\\label|$|\n)/)||[])[1]||"";const img=[...b.matchAll(/\\includegraphics(?:\[[^\]]*\])?\{([^}]*)\}/g)].map(m=>m[1]);
-    return keep(`<figure class="pfig"><div class="pfig-ph">${k==="figure"?"🖼 "+esc(img.join(", ")||"figure"):"▦ table"}</div>${cap?`<figcaption><b>${k==="figure"?"Figure":"Table"}.</b> ${inl(cap)}</figcaption>`:""}</figure>`)});
-  t=t.replace(/\\begin\{(itemize|enumerate)\}([\s\S]*?)\\end\{\1\}/g,(_,k,b)=>keep(`<${k==="itemize"?"ul":"ol"}>${b.split(/\\item\b/).slice(1).map(x=>`<li>${inl(x.trim())}</li>`).join("")}</${k==="itemize"?"ul":"ol"}>`));
-  t=t.replace(/\\begin\{abstract\}([\s\S]*?)\\end\{abstract\}/g,(_,b)=>keep(`<div class="pabs"><b>Abstract.</b> ${inl(b.trim())}</div>`));
-  t=t.replace(/\\(title|author|affiliation|date)\{([\s\S]*?)\}\s*\n/g,(_,k,b)=>keep(`<div class="p${k==="title"?"titl":k}">${inl(b)}</div>`));
-  t=t.replace(/\\(sub)?(sub)?section\*?\{([^}]*)\}/g,(_,a,b,x)=>keep(`<h${b?6:a?5:4} class="psh">${inl(x)}</h${b?6:a?5:4}>`)).replace(/\\paragraph\{([^}]*)\}/g,(_,x)=>keep(`<b>${inl(x)}</b> `));
-  t=t.replace(/\\(begin|end)\{document\}|\\maketitle|\\bibliographystyle\{[^}]*\}|\\documentclass(\[[^\]]*\])?\{[^}]*\}|\\usepackage(\[[^\]]*\])?\{[^}]*\}/g,"");
-  t=t.replace(/\\bibliography\{([^}]*)\}/g,(_,b)=>keep(`<div class="note">[Bibliography: ${esc(b)}.bib]</div>`));
-  return t.split(/\n\s*\n/).map(p=>p.trim()).filter(Boolean).map(p=>/^\u0000\d+\u0000$/.test(p)?p:`<p>${inl(p)}</p>`).join("").replace(/\u0000(\d+)\u0000/g,(_,i)=>M[+i]).replace(/\u0000(\d+)\u0000/g,(_,i)=>M[+i])}
-function inl(s){const m=[];s=String(s).replace(/\$[^$]+\$|\\\([\s\S]*?\\\)/g,x=>{m.push(x);return `\u0001${m.length-1}\u0001`});
-  s=esc(s).replace(/\\textbf\{([^{}]*)\}/g,"<b>$1</b>").replace(/\\(emph|textit)\{([^{}]*)\}/g,"<i>$2</i>").replace(/\\texttt\{([^{}]*)\}/g,"<code>$1</code>")
-   .replace(/\\(cite|citep|citet)\{([^}]*)\}/g,(_,c,k)=>`<span class="pcite">[${k.split(",").map(x=>x.trim()).join(", ")}]</span>`).replace(/\\(eq)?ref\{([^}]*)\}/g,(_,e,k)=>`<span class="pref">${e?"(":""}${k}${e?")":""}</span>`)
-   .replace(/\\label\{[^}]*\}/g,"").replace(/~/g,"&nbsp;").replace(/``/g,"“").replace(/''/g,"”").replace(/---/g,"—").replace(/--/g,"–").replace(/\\([%&#_$])/g,"$1").replace(/\\\\/g,"<br>").replace(/\\[a-zA-Z]+\*?/g,m=>/^\\(ie|eg|etal)$/.test(m)?"":m);
-  return s.replace(/\u0001(\d+)\u0001/g,(_,i)=>esc(m[+i]))}
-let wKatex=null;function wMath(el){if(!el)return;const go=()=>window.renderMathInElement&&window.renderMathInElement(el,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"$",right:"$",display:false},{left:"\\(",right:"\\)",display:false}],throwOnError:false});
-  if(window.renderMathInElement)return go();if(!wKatex){const v="0.16.11",b=`https://cdn.jsdelivr.net/npm/katex@${v}/dist/`;const l=document.createElement("link");l.rel="stylesheet";l.href=b+"katex.min.css";document.head.appendChild(l);
-    const js=s=>new Promise((r,j)=>{const e=document.createElement("script");e.src=s;e.onload=r;e.onerror=j;document.head.appendChild(e)});wKatex=js(b+"katex.min.js").then(()=>js(b+"contrib/auto-render.min.js")).catch(()=>{})}wKatex.then(go)}
-
-/* --- word diff (Myers) for history --- */
-function wDiff(a,b){a=a.match(/\s+|[^\s]+/g)||[];b=b.match(/\s+|[^\s]+/g)||[];const n=a.length,m=b.length;if(n*m>4e6)return `<p class="note">Too long to compare word by word.</p>`;
-  const max=n+m,v={1:0},trace=[];outer:for(let d=0;d<=max;d++){trace.push({...v});for(let k=-d;k<=d;k+=2){let x=(k===-d||(k!==d&&v[k-1]<v[k+1]))?v[k+1]:v[k-1]+1,y=x-k;while(x<n&&y<m&&a[x]===b[y]){x++;y++}v[k]=x;if(x>=n&&y>=m)break outer}}
-  const out=[];let x=n,y=m;for(let d=trace.length-1;d>=0;d--){const vv=trace[d],k=x-y,pk=(k===-d||(k!==d&&vv[k-1]<vv[k+1]))?k+1:k-1,px=vv[pk],py=px-pk;
-    while(x>px&&y>py){out.push(["=",a[x-1]]);x--;y--}if(d>0){if(x===px)out.push(["+",b[y-1]]);else out.push(["-",a[x-1]])}x=px;y=py}
-  return out.reverse().map(([o,s])=>o==="="?esc(s):o==="+"?`<ins>${esc(s)}</ins>`:`<del>${esc(s)}</del>`).join("")}
-
-/* --- view --- */
-function vWriting(){
-  if(!LV.on)return `<div class="empty">Connecting… The writing space needs the live connection.</div>`;
-  const P=wPapers();if(!P.length)return `<section class="ptitle"><div><h2>Writing</h2><p>Draft papers together, section by section, in LaTeX. Start a paper or import the .tex from Overleaf (Menu › Download › Source).</p></div></section>
-    <div class="wstart"><button type="button" class="btn primary" data-wnew>＋ New paper</button><label class="btn">⤒ Import .tex<input type="file" accept=".tex,text/x-tex,text/plain" data-wimp hidden></label></div>`;
-  if(!W.paper||!P.find(p=>p.id===W.paper))W.paper=P[0].id;const p=P.find(x=>x.id===W.paper),secs=wSecs(p.id),words=secs.filter(s=>!s.raw).reduce((n,s)=>n+wWords(s.body),0);
-  const ov=(S.projects.find(x=>x.overleaf)||{}).overleaf;const openCom=Object.values(PW.com).filter(c=>c.paper===p.id&&!c.resolved&&!c.del).length;
-  return `<section class="ptitle"><div><h2>${esc(p.title)}</h2><p>${secs.length} sections · ${words.toLocaleString("en")} words · ${openCom} open comment${openCom===1?"":"s"}. Click <b>Edit</b> on a section; others see it as locked while you write. Every save is kept in History.</p></div>
-   <div class="row">${P.length>1?`<select class="wsel" data-wpaper aria-label="Paper">${P.map(x=>`<option value="${esc(x.id)}"${x.id===p.id?" selected":""}>${esc(x.title)}</option>`).join("")}</select>`:""}<button type="button" class="btn" data-wnew>＋ Paper</button></div></section>
-  <div class="wbar"><button type="button" class="btn primary" data-wadd>＋ Section</button><label class="btn">⤒ Import .tex<input type="file" accept=".tex,text/x-tex,text/plain" data-wimp hidden></label><button type="button" class="btn" data-wcopy>⧉ Copy LaTeX</button><button type="button" class="btn" data-wdl>⤓ Download .tex</button>${ov?`<a class="btn" href="${esc(ov)}" target="_blank" rel="noopener">Overleaf ↗</a>`:""}<button type="button" class="btn ghost" data-wren>Rename</button></div>
-  <nav class="wtoc" aria-label="Sections">${secs.map(s=>{const l=wLock(p.id,s.id),nc=Object.values(PW.com).filter(c=>c.paper===p.id&&c.sec===s.id&&!c.resolved&&!c.del).length,upd=wUpdated(s);return `<a href="#writing" data-wgo="${esc(s.id)}">${esc(s.title||"Untitled")}${l?` <span class="wlk">✎ ${esc(l.by)}</span>`:""}${nc?` <span class="wnc">💬${nc}</span>`:""}${upd?` <span class="wup">new</span>`:""}</a>`}).join("")}</nav>
-  <div class="wdoc">${secs.map(s=>wSec(p,s)).join("")||`<div class="empty">No sections yet. Add one or import a .tex file.</div>`}</div>`}
-function wUpdated(s){const seen=W.seen[s.paper+"__"+s.id];return s.by&&s.by!==myName()&&s.t&&(!seen||s.t>seen)}
-function wSec(p,s){const key=p.id+"__"+s.id,ed=W.edit===s.id,l=wLock(p.id,s.id),coms=Object.entries(PW.com).filter(([,c])=>c.paper===p.id&&c.sec===s.id&&!c.del).sort((a,b)=>a[1].t-b[1].t),openC=coms.filter(([,c])=>!c.resolved),o=W.open[s.id]||"";
-  const upd=wUpdated(s);
-  const head=`<header class="wsh"><div><h3>${esc(s.title||"Untitled")}${s.raw?` <span class="pj">raw LaTeX</span>`:""}</h3><div class="note">${wWords(s.body)} words${s.by?` · last edit ${esc(s.by)}${s.t?" · "+esc(ago(s.t)):""}`:""}${upd?` · <b class="wup">changed since you last looked</b>`:""}</div></div>
-   <div class="row">${l?`<span class="wlk">✎ ${esc(l.by)} is editing</span>`:ed?"":`<button type="button" class="btn sm primary" data-wedit="${esc(s.id)}">✎ Edit</button>`}<button type="button" class="btn sm" data-wtab="${esc(s.id)}|com" aria-pressed="${o==="com"}">💬 ${openC.length||""}</button><button type="button" class="btn sm" data-wtab="${esc(s.id)}|hist" aria-pressed="${o==="hist"}">History</button>${upd?`<button type="button" class="btn sm" data-wtab="${esc(s.id)}|hist" title="Compare with the version you last saw">What changed</button><button type="button" class="btn sm ghost" data-wseen="${esc(s.id)}">Mark read</button>`:""}</div></header>`;
-  let body;
-  if(ed)body=`<div class="wedit"><input class="wtitle" id="wTitle" value="${esc(s.title||"")}" aria-label="Section title" placeholder="Section title"><div class="wsplit"><textarea id="wBody" spellcheck="true" aria-label="LaTeX source">${esc(s.body||"")}</textarea><div class="wprev" id="wPrev">${tex2html(s.body)}</div></div>
-    <div class="row"><button type="button" class="btn primary" data-wsave="${esc(s.id)}">Save</button><button type="button" class="btn" data-wcancel>Cancel</button><button type="button" class="btn ghost" data-wcomsel="${esc(s.id)}" title="Select text in the editor first">💬 Comment on selection</button><span class="sp"></span><button type="button" class="btn ghost sm" data-wup="${esc(s.id)}" title="Move up">↑</button><button type="button" class="btn ghost sm" data-wdown="${esc(s.id)}" title="Move down">↓</button><button type="button" class="btn danger sm" data-wdel="${esc(s.id)}">Delete section</button></div>
-    <p class="note">LaTeX as in Overleaf: $…$, \\[…\\], equation/align, \\cite, \\ref, figure (shown as a placeholder). Ctrl/⌘+S saves.</p></div>`;
-  else body=`<div class="wbody${s.raw&&!W.open["raw_"+s.id]?" wraw":""}" data-wsee="${esc(s.id)}">${s.raw&&!W.open["raw_"+s.id]?`<button type="button" class="btn sm ghost" data-wraw="${esc(s.id)}">Show ${esc(s.title)}</button>`:tex2html(s.body)||`<p class="note">Empty section.</p>`}</div>`;
-  let panel="";
-  if(o==="com")panel=`<div class="wpanel"><h4>Comments</h4>${coms.length?coms.map(([id,c])=>`<div class="wcom${c.resolved?" done":""}">${c.quote?`<blockquote>${esc(c.quote)}</blockquote>`:""}<div>${esc(c.text)}</div><div class="note">${esc(c.by||"?")} · ${esc(ago(c.t))}${c.resolved?" · resolved":""} <button type="button" class="xdel" data-wres="${esc(id)}">${c.resolved?"Reopen":"Resolve"}</button></div></div>`).join(""):`<p class="note">No comments yet.</p>`}
-    <form class="wcf" data-wcf="${esc(s.id)}"><textarea id="wComQ" hidden></textarea><textarea id="wComT" rows="2" placeholder="Add a comment on this section…" aria-label="Comment"></textarea><button class="btn primary" type="submit">Comment</button></form></div>`;
-  if(o==="hist"){const h=W.hist[key];panel=`<div class="wpanel"><h4>History</h4>${!h?`<p class="note">Loading…</p>`:h.length?`<ol class="whist">${h.map((v,i)=>`<li><button type="button" class="linkb" data-wv="${esc(s.id)}|${i}">${esc(new Date(v.t).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}))} · ${esc(v.by||"?")} · ${wWords(v.body)} words</button></li>`).join("")}</ol>
-     ${W.hv&&W.hv[0]===key?`<div class="wdiff"><div class="row"><b>Changes from this version to the current text</b><span class="sp"></span><button type="button" class="btn sm" data-wrestore="${esc(s.id)}|${W.hv[1]}">Restore this version</button></div><div class="wdtxt">${wDiff(h[W.hv[1]].body||"",s.body||"")}</div></div>`:`<p class="note">Pick a version to see what changed since then (green added, red removed).</p>`}`:`<p class="note">No saved versions yet.</p>`}</div>`}
-  return `<article class="wsec${upd?" wnew":""}" id="ws-${esc(s.id)}">${head}${body}${panel}</article>`}
-/* the text being typed lives in W.draft, so any re-render (someone else saving, a device update) never loses it */
-function wSnap(){const ta=$("#wBody");if(ta&&W.edit)W.draft={id:W.edit,v:ta.value,t:$("#wTitle").value,s:ta.selectionStart,e:ta.selectionEnd,top:ta.scrollTop,h:ta.style.height,f:document.activeElement===ta||document.activeElement===$("#wTitle")?document.activeElement.id:""};const ct=$("#wComT");W.cdraft=ct?ct.value:W.cdraft}
-function wAfter(){const ta=$("#wBody"),dr=W.draft;if(ta&&dr&&dr.id===W.edit){ta.value=dr.v;$("#wTitle").value=dr.t;if(dr.h)ta.style.height=dr.h;ta.scrollTop=dr.top||0;if(dr.f){const el=document.getElementById(dr.f);el.focus();if(dr.f==="wBody")ta.setSelectionRange(dr.s,dr.e)}$("#wPrev").innerHTML=tex2html(dr.v)}
-  const ct=$("#wComT");if(ct&&W.cdraft)ct.value=W.cdraft;wMath($("#view"))}
-function wRender(){if(view()!=="writing")return;wSnap();render()}
-async function wLoadHist(p,s){const key=p+"__"+s,{collection,query,where,getDocs,documentId,orderBy}=LV.fs;
-  try{const q=query(collection(LV.db,"phist"),where(documentId(),">=",key+"__"),where(documentId(),"<",key+"__\uf8ff"));const snap=await getDocs(q);const out=[];for(const d of snap.docs){const x=d.data();try{out.push({t:tms(x),...(await decB(CR.k,x))})}catch(e){}}
-    W.hist[key]=out.sort((a,b)=>b.t-a.t)}catch(e){console.error(e);W.hist[key]=[]}wRender()}
-async function wSaveSec(p,s,patch,histToo){const cur=PW.docs[p+"__"+s]||{};const o={...cur,...patch,by:myName()};delete o.t;
-  if(!await wPut("pdoc",p+"__"+s,o))return false;if(histToo)await wPut("phist",`${p}__${s}__${Date.now().toString(36)}`,{body:o.body||"",title:o.title||"",by:myName()});delete W.hist[p+"__"+s];return true}
-function wSetLock(p,s,on){wPut("plock",p+"__"+s,{by:myName(),until:on?Date.now()+90000:0});clearInterval(W.lockT);if(on)W.lockT=setInterval(()=>{if(W.edit)wPut("plock",W.paper+"__"+W.edit,{by:myName(),until:Date.now()+90000})},45000)}
-function wNeedName(){if(myName())return true;const n=prompt("Your name (shown to the others):");if(n&&n.trim()){setName(n.trim());return true}return false}
-function wImport(text,title){const T=String(text).replace(/\r\n/g,"\n");const out=[];const bd=T.indexOf("\\begin{document}");
-  const pre=bd>=0?T.slice(0,bd):"",body=bd>=0?T.slice(bd+16):T;const end=body.lastIndexOf("\\end{document}");const main=end>=0?body.slice(0,end):body;
-  if(pre.trim())out.push({title:"LaTeX preamble",body:pre.trim(),raw:true});
-  const parts=main.split(/(?=\\section\*?\{)/);if(parts[0]&&!/^\\section/.test(parts[0])&&parts[0].trim())out.push({title:"Front matter (title, abstract)",body:parts[0].trim(),raw:false,front:true});
-  for(const x of parts.filter(x=>/^\\section/.test(x))){const m=x.match(/^\\section\*?\{([^}]*)\}\s*/);out.push({title:m[1],body:x.slice(m[0].length).trim(),star:/^\\section\*/.test(x)})}
-  const last=out[out.length-1];if(last){const bi=last.body.search(/\\(bibliographystyle|bibliography\{|begin\{thebibliography\}|appendix)/);if(bi>0){out.push({title:"End matter (bibliography)",body:last.body.slice(bi).trim(),raw:true});last.body=last.body.slice(0,bi).trim()}}
-  const tm=T.match(/\\title\{([^}]*)\}/);return {title:title||(tm?tm[1]:"Imported paper"),secs:out}}
-function wExport(p){return wSecs(p).map(s=>s.raw&&s.title==="LaTeX preamble"?s.body+"\n\\begin{document}\n":s.raw||s.front?s.body+"\n":`\\section${s.star?"*":""}{${s.title}}\n${s.body}\n`).join("\n")+(wSecs(p).some(s=>s.title==="LaTeX preamble")?"\n\\end{document}\n":"")}
-document.addEventListener("click",async e=>{const t=e.target.closest("[data-wnew],[data-wadd],[data-wedit],[data-wcancel],[data-wsave],[data-wtab],[data-wv],[data-wrestore],[data-wres],[data-wgo],[data-wcopy],[data-wdl],[data-wren],[data-wup],[data-wdown],[data-wdel],[data-wraw],[data-wseen],[data-wcomsel]");if(!t||view()!=="writing")return;const d=t.dataset,p=W.paper;
-  if(d.wnew!=null){if(!wNeedName())return;const title=prompt("Paper title:");if(!title)return;const id=wid();await wPut("pdoc",id+"__meta",{type:"paper",id,title,created:Date.now(),by:myName()});W.paper=id;return}
-  if(d.wren!=null){const cur=PW.docs[p+"__meta"];const title=prompt("Paper title:",cur&&cur.title);if(title)wPut("pdoc",p+"__meta",{...cur,title,by:myName(),t:undefined});return}
-  if(d.wadd!=null){if(!wNeedName())return;const title=prompt("Section title:","New section");if(title==null)return;const secs=wSecs(p),id=wid();await wPut("pdoc",p+"__"+id,{type:"sec",paper:p,id,title,body:"",order:(secs.length?secs[secs.length-1].order:0)+10,by:myName()});W.edit=id;wSetLock(p,id,true);return}
-  if(d.wedit){if(!wNeedName())return;W.draft=null;if(W.edit&&W.edit!==d.wedit)return toast("Save or cancel the section you are editing first");if(wLock(p,d.wedit))return toast("Someone is editing this section");W.edit=d.wedit;wSetLock(p,d.wedit,true);wRender();setTimeout(()=>{const ta=$("#wBody");if(ta){ta.style.height=Math.min(innerHeight*0.7,Math.max(260,ta.scrollHeight+4))+"px";ta.focus()}},0);return}
-  if(d.wcancel!=null){if(W.draft&&W.draft.id===W.edit&&W.draft.v!==(PW.docs[p+"__"+W.edit]||{}).body&&!confirm("Discard your unsaved changes?"))return;if(W.edit)wSetLock(p,W.edit,false);W.edit=null;W.draft=null;wRender();return}
-  if(d.wsave){const b=$("#wBody").value,ti=$("#wTitle").value.trim();t.disabled=true;if(await wSaveSec(p,d.wsave,{body:b,title:ti},true)){W.seen[p+"__"+d.wsave]=Date.now()+5000;try{localStorage.setItem("lafhub_seen",JSON.stringify(W.seen))}catch(x){}wSetLock(p,d.wsave,false);W.edit=null;W.draft=null;toast("Saved");wRender()}else t.disabled=false;return}
-  if(d.wtab){const [s,k]=d.wtab.split("|");W.open[s]=W.open[s]===k?"":k;W.hv=null;if(W.open[s]==="hist"){const key=p+"__"+s;wLoadHist(p,s).then(()=>{const seen=W.seen[key];const h=W.hist[key]||[];if(seen&&wUpdated(PW.docs[key]||{})){const i=h.findIndex(v=>v.t<=seen);if(i>=0){W.hv=[key,i];wRender()}}})}wRender();return}
-  if(d.wv){const [s,i]=d.wv.split("|");W.hv=[p+"__"+s,+i];wRender();return}
-  if(d.wrestore){const [s,i]=d.wrestore.split("|");const v=(W.hist[p+"__"+s]||[])[+i];if(!v||!confirm("Replace the current text of this section with this version? (The current text stays in History.)"))return;if(await wSaveSec(p,s,{body:v.body,title:v.title||PW.docs[p+"__"+s].title},true))toast("Restored");return}
-  if(d.wres){const c=PW.com[d.wres];if(c){const o={...c,resolved:!c.resolved};delete o.t;wPut("pcom",d.wres,o)}return}
-  if(d.wgo){e.preventDefault();const el=document.getElementById("ws-"+d.wgo);if(el)el.scrollIntoView({behavior:"smooth",block:"start"});return}
-  if(d.wcopy!=null){try{await navigator.clipboard.writeText(wExport(p));toast("LaTeX copied: paste it into Overleaf")}catch(x){toast("Copy failed; use Download")}return}
-  if(d.wdl!=null){const blob=new Blob([wExport(p)],{type:"text/x-tex"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=((PW.docs[p+"__meta"]||{}).title||"paper").replace(/[^A-Za-z0-9-]+/g,"_").slice(0,60)+".tex";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);return}
-  if(d.wup||d.wdown){const id=d.wup||d.wdown,secs=wSecs(p),i=secs.findIndex(x=>x.id===id),j=i+(d.wup?-1:1);if(j<0||j>=secs.length)return;const a=secs[i],b=secs[j];await wSaveSec(p,a.id,{order:b.order});await wSaveSec(p,b.id,{order:a.order});return}
-  if(d.wdel){if(!confirm("Delete this section? (It stays in History and can be restored by Claude.)"))return;await wSaveSec(p,d.wdel,{del:true},false);wSetLock(p,d.wdel,false);W.edit=null;return}
-  if(d.wraw){W.open["raw_"+d.wraw]=1;wRender();return}
-  if(d.wseen){W.seen[p+"__"+d.wseen]=Date.now();try{localStorage.setItem("lafhub_seen",JSON.stringify(W.seen))}catch(x){}wRender();return}
-  if(d.wcomsel){const ta=$("#wBody");const q=ta.value.slice(ta.selectionStart,ta.selectionEnd).trim();if(!q)return toast("Select some text first");const txt=prompt("Comment on: “"+q.slice(0,80)+(q.length>80?"…":"")+"”");if(!txt)return;wPut("pcom",`${p}__${d.wcomsel}__${wid()}`,{paper:p,sec:d.wcomsel,quote:q.slice(0,500),text:txt,by:myName(),resolved:false});toast("Comment added");return}});
-document.addEventListener("submit",e=>{const f=e.target.closest("[data-wcf]");if(!f)return;e.preventDefault();if(!wNeedName())return;const txt=$("#wComT").value.trim();if(!txt)return;wPut("pcom",`${W.paper}__${f.dataset.wcf}__${wid()}`,{paper:W.paper,sec:f.dataset.wcf,quote:"",text:txt,by:myName(),resolved:false}).then(ok=>{if(ok){$("#wComT").value="";W.cdraft=""}})});
-document.addEventListener("change",async e=>{if(e.target.matches("[data-wpaper]")){W.paper=e.target.value;W.edit=null;wRender();return}
-  if(e.target.matches("[data-wimp]")){const f=e.target.files[0];if(!f)return;if(!wNeedName())return;const txt=await f.text();const r=wImport(txt);
-    const target=wPapers().length&&confirm(`Import ${r.secs.length} sections into a NEW paper?\n\nOK = new paper “${r.title}”\nCancel = replace the sections of the current paper (they stay in History)`)?null:W.paper;
-    let pid=target;if(!pid){pid=wid();await wPut("pdoc",pid+"__meta",{type:"paper",id:pid,title:r.title,created:Date.now(),by:myName()})}else{for(const s of wSecs(pid))await wSaveSec(pid,s.id,{del:true},false)}
-    let o=10;for(const s of r.secs){const id=wid();await wPut("pdoc",pid+"__"+id,{type:"sec",paper:pid,id,title:s.title,body:s.body,raw:!!s.raw,front:!!s.front,star:!!s.star,order:o,by:myName()});await wPut("phist",`${pid}__${id}__${Date.now().toString(36)}`,{body:s.body,title:s.title,by:myName()});o+=10}
-    W.paper=pid;toast(`Imported ${r.secs.length} sections`);e.target.value=""}});
-document.addEventListener("input",e=>{if(e.target.id==="wBody"||e.target.id==="wTitle"||e.target.id==="wComT")wSnap();if(e.target.id==="wBody"){const p=$("#wPrev");clearTimeout(W.pt);W.pt=setTimeout(()=>{p.innerHTML=tex2html(e.target.value);wMath(p)},250)}});
-document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key==="s"&&W.edit&&view()==="writing"){e.preventDefault();const b=document.querySelector(`[data-wsave]`);if(b)b.click()}});
-window.addEventListener("beforeunload",()=>{if(W.edit&&LV.on)wPut("plock",W.paper+"__"+W.edit,{by:myName(),until:0})});
-
 /* ---------- Timeline: what was measured on which day ---------- */
 const isoOf=ms=>new Date(ms-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const WD=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -839,7 +670,7 @@ async function startLive(pw,remember){try{const [{initializeApp},A,fs]=await Pro
   else{await auth.authStateReady();if(!auth.currentUser){lockOut();return}}
   LV.fs=fs;LV.db=fs.getFirestore(app);LV.on=true;LV.err="";
   const sub=(col,n,key)=>fs.onSnapshot(fs.query(fs.collection(LV.db,col),fs.orderBy("t","desc"),fs.limit(n)),async snap=>{const out=[];for(const d of snap.docs){const x=d.data();try{out.push({id:d.id,t:tms(x),...(await decB(CR.k,x))})}catch(e){}}LV[key]=out;drawLive()},()=>{LV.err="offline";drawLive()});
-  sub("updates",30,"updates");sub("chat",80,"chat");try{wSubscribe(fs)}catch(e){console.error(e)}
+  sub("updates",30,"updates");sub("chat",80,"chat");
   fs.onSnapshot(fs.collection(LV.db,"items"),async snap=>{const it={};for(const d of snap.docs){const x=d.data();try{it[d.id]={t:tms(x),...(await decB(CR.k,x))}}catch(e){}}LV.items=it;merge();render()},()=>{LV.err="offline";drawLive()});
   drawLive()}catch(e){LV.err="offline";drawLive()}}
 async function livePost(col,obj){if(!LV.on){toast("Not connected yet. Try again in a few seconds.");return false}const {addDoc,collection,serverTimestamp}=LV.fs;try{await addDoc(collection(LV.db,col),{t:serverTimestamp(),...(await encB(CR.k,obj))});return true}catch(e){toast("Could not save");return false}}
