@@ -160,7 +160,7 @@ dl.info dt{color:var(--muted);font-weight:600}dl.info dd{margin:0;min-width:0;ov
 .dnone{display:block;min-height:18px;border-radius:4px;background:repeating-linear-gradient(45deg,transparent 0 3px,#eef0f6 3px 5px)}
 .dmap:not(.hasub)>.dnone{min-height:28px}
 .dv{position:relative;border:0;border-radius:5px;background:var(--c);min-height:28px;min-width:0;cursor:pointer;padding:0;font:600 11px var(--mono);color:#fff;transition:transform .08s}
-.hasub .dv{min-height:20px;border-radius:4px}
+.hasub .dv{min-height:28px;border-radius:4px}
 .dv:hover{transform:scale(1.12);z-index:2;box-shadow:0 2px 8px rgba(20,26,51,.3)}
 .dv.on{outline:3px solid var(--ink);outline-offset:1px;z-index:2}
 .dv.dim{opacity:.18}
@@ -371,11 +371,12 @@ function geo(m){let rows=m.rows,cols=m.cols,tr=false;if(rows.length>20&&rows.len
   const sub=m.sub&&m.sub.length?m.sub:null;return {rows,cols,tr,sub}}
 function cellOf(m,g,r,c){// devices at visual row r / col c
   const out={};for(const [n,d] of Object.entries(m.dev)){if(d.extra)continue;const rr=g.tr?d.col:d.row,cc=g.tr?d.row:d.col;if(String(rr)===String(r)&&String(cc)===String(c))out[d.sub||"_"]=n}return out}
-function miniMap(sid){const m=DEV&&DEV.maps[sid];if(!m||m.list)return "";const g=geo(m),u=g.sub?3.2:7,gap=g.sub?2:1,cw=g.sub?2*u+1:u;
-  let x0=0,y0=0,out="";g.rows.forEach((r,ri)=>g.cols.forEach((c,ci)=>{const cell=cellOf(m,g,r,c),X=ci*(cw+gap),Y=ri*(cw+gap);
-    if(g.sub){g.sub.forEach((j,k)=>{const n=cell[j];if(!n)return;const d=devGet(sid,n);out+=`<rect x="${X+(k%2)*(u+1)}" y="${Y+Math.floor(k/2)*(u+1)}" width="${u}" height="${u}" fill="var(${STV[d.st]||"--idle"})"/>`})}
+function rowSubs(m,g,r){const have=new Set(Object.values(m.dev).filter(d=>!d.extra&&String(g.tr?d.col:d.row)===String(r)).map(d=>d.sub));return g.sub.filter(j=>have.has(j))}
+function miniMap(sid){const m=DEV&&DEV.maps[sid];if(!m||m.list)return "";const g=geo(m),u=g.sub?2.6:7,gap=g.sub?2:1,cw=g.sub?4*u+3:u,ch=g.sub?u:u;
+  let x0=0,y0=0,out="";g.rows.forEach((r,ri)=>g.cols.forEach((c,ci)=>{const cell=cellOf(m,g,r,c),X=ci*(cw+gap),Y=ri*(ch+gap);
+    if(g.sub){const rs=rowSubs(m,g,r),w=(cw-(rs.length-1))/rs.length;rs.forEach((j,k)=>{const n=cell[j];if(!n)return;const d=devGet(sid,n);out+=`<rect x="${X+k*(w+1)}" y="${Y}" width="${w}" height="${u}" fill="var(${STV[d.st]||"--idle"})"/>`})}
     else{const n=cell._;if(!n)return;const d=devGet(sid,n);out+=`<rect x="${X}" y="${Y}" width="${cw}" height="${cw}" rx="1" fill="var(${STV[d.st]||"--idle"})"/>`}}));
-  const W=g.cols.length*(cw+gap),Hh=g.rows.length*(cw+gap);return `<svg class="mini" viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${out}</svg>`}
+  const W=g.cols.length*(cw+gap),Hh=g.rows.length*(ch+gap);return `<svg class="mini" viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${out}</svg>`}
 function sbar(c,t){return bar(c,t||1)}
 const RESCAN="https://github.com/nhattanphan/stno/issues/new?title="+encodeURIComponent("Rescan sDrive")+"&body="+encodeURIComponent("Started from the hub. Just press Create / Submit; the scan takes about 2 minutes, then reload the hub.");
 const rescanBtn=()=>`<a class="btn" href="${RESCAN}" target="_blank" rel="noopener" title="Re-reads sDrive › 02_Measurements (runs by itself every night; needs Tan's GitHub account)">↻ Rescan sDrive</a>`;
@@ -398,12 +399,12 @@ function vDie(){const sid=(location.hash.match(/^#die-(.+)$/)||[])[1];const s=S.
   let mapHTML="";
   if(!m||m.list){const names=devNames(sid);mapHTML=`<div class="dlist">${names.length?names.map(n=>devBtn(sid,n,sel,hl,1)).join(""):`<div class="empty">No device list for this sample yet.</div>`}</div>`}
   else{const g=geo(m);const hasCfg=Object.values(m.dev).some(d=>d.cfg);const cw=g.sub?0:hasCfg?46:(g.cols.length>12?30:38);
-    mapHTML=`<div class="dscroll"><div class="dmap${g.sub?" hasub":""}${hasCfg?" cfg":""}" style="grid-template-columns:auto repeat(${g.cols.length},${g.sub?"minmax(44px,1fr)":cw+"px"})">
+    mapHTML=`<div class="dscroll"><div class="dmap${g.sub?" hasub":""}${hasCfg?" cfg":""}" style="grid-template-columns:auto repeat(${g.cols.length},${g.sub?"minmax(92px,1fr)":cw+"px"})">
      <div class="dcorner">${g.tr?"":""}</div>${g.cols.map(cn=>{const info=g.tr?((m.rowInfo||{})[cn]||""):((m.colInfo||{})[cn]||"");return `<div class="dch">${esc(cn)}${info?`<small>${esc(info)}</small>`:""}</div>`}).join("")}
      ${g.rows.map(r=>{const ri=g.tr?((m.colInfo||{})[r]||""):((m.rowInfo||{})[r]||"");return `<div class="drh">${esc(r)}${ri?`<small>${esc(ri)}</small>`:""}</div>`+g.cols.map(cc=>{const cell=cellOf(m,g,r,cc);
-       if(g.sub)return `<div class="dcell">${g.sub.map(j=>cell[j]?devBtn(sid,cell[j],sel,hl):`<span class="dnone"></span>`).join("")}</div>`;
+       if(g.sub){const rs=rowSubs(m,g,r);return `<div class="dcell" style="grid-template-columns:repeat(${rs.length||1},1fr)">${rs.map(j=>cell[j]?devBtn(sid,cell[j],sel,hl):`<span class="dnone"></span>`).join("")}</div>`}
        return cell._?devBtn(sid,cell._,sel,hl):`<span class="dnone"></span>`}).join("")}).join("")}</div></div>
-     <p class="note">${hasCfg?"Dots show the pillar arrangement in each cell (from the SEM layout); the number is the pillar count when above 4. ":""}${m.colUnit?`Column header: ${esc(m.colUnit)}. `:""}${g.tr?"Map shown rotated (series as rows) to fit the screen. ":""}${g.sub?"Each cell holds junctions J1 J2 / J3 J4. ":""}Files indexed from sDrive on ${esc(fmtD(DEV.scanned))} (refreshed every night, or ${`<a href="${RESCAN}" target="_blank" rel="noopener">rescan now ↗</a>`}).</p>`}
+     <p class="note">${hasCfg?"Dots show the pillar arrangement in each cell (from the SEM layout); the number is the pillar count when above 4. ":""}${m.colUnit?`Column header: ${esc(m.colUnit)}. `:""}${g.tr?"Map shown rotated (series as rows) to fit the screen. ":""}${g.sub?"Each cell shows its junctions left to right (J1 J2 J3 J4; rows A–D have J1 J2 only). ":""}Files indexed from sDrive on ${esc(fmtD(DEV.scanned))} (refreshed every night, or ${`<a href="${RESCAN}" target="_blank" rel="noopener">rescan now ↗</a>`}).</p>`}
   return `${head}<div class="dwrap"><section class="dmain">${sbar(c,t)}${leg}${mapHTML}</section><aside class="dside" id="dside">${sel?devPanel(sid,sel):samplePanel(s)}</aside></div>`}
 function pillars(cfg,n,spc){cfg=String(cfg||"").toLowerCase();let sp=/far/.test(cfg)?0.85:/medium/.test(cfg)?0.6:0.42;if(spc)sp=0.3+0.6*Math.log(spc/150)/Math.log(2000/150);let P=[];
   const grid=(k,g)=>{const o=[];for(let i=0;i<k;i++)for(let j=0;j<k;j++)o.push([(i-(k-1)/2)*g,(j-(k-1)/2)*g]);return o};
