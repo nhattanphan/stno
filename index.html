@@ -358,7 +358,8 @@ function bar(c,t){const parts=STC.map(([k,,v])=>[k,c[k]||0,v]).filter(x=>x[1]);i
 let DEV=null;
 const STL={alive:"Alive",untested:"Untested",suspect:"Suspect",dead:"Dead",measdead:"Died in measurement",short:"Short",open:"Open",skip:"Not used (C-state)"};
 const STV={alive:"--ok",untested:"--idle",suspect:"--warn",dead:"--bad",measdead:"--bad2",short:"--vio",open:"--vio",skip:"--skip"};
-async function loadDev(){try{const x=await fetch("devices.enc.json",{cache:"no-store"}).then(r=>r.json());DEV=await decB(CR.k,x);render()}catch(e){DEV={maps:{},files:{},err:1};render()}}
+async function loadDev(){try{const x=await fetch("devices.enc.json",{cache:"no-store"}).then(r=>r.json());DEV=await decB(CR.k,x);
+  try{const r=await fetch("scan.enc.json",{cache:"no-store"});if(r.ok){const sc=await decB(CR.k,await r.json());if(sc&&sc.files){DEV.files=sc.files;DEV.scanned=sc.scanned}}}catch(e){}render()}catch(e){DEV={maps:{},files:{},err:1};render()}}
 function devGet(sid,name){const m=DEV&&DEV.maps[sid];if(!m)return null;const b=m.dev[name];const it=LV.items["dev__"+sid+"__"+name];
   if(!it||it.del)return b;return {...(b||{}),...it.item,_by:it.by,_t:it.t}}
 function devNames(sid){const m=DEV&&DEV.maps[sid];if(!m)return [];const n=new Set(Object.keys(m.dev));for(const k of Object.keys(LV.items))if(k.startsWith("dev__"+sid+"__"))n.add(k.slice(7+sid.length));return [...n]}
@@ -376,9 +377,11 @@ function miniMap(sid){const m=DEV&&DEV.maps[sid];if(!m||m.list)return "";const g
     else{const n=cell._;if(!n)return;const d=devGet(sid,n);out+=`<rect x="${X}" y="${Y}" width="${cw}" height="${cw}" rx="1" fill="var(${STV[d.st]||"--idle"})"/>`}}));
   const W=g.cols.length*(cw+gap),Hh=g.rows.length*(cw+gap);return `<svg class="mini" viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${out}</svg>`}
 function sbar(c,t){return bar(c,t||1)}
+const RESCAN="https://github.com/nhattanphan/stno/issues/new?title="+encodeURIComponent("Rescan sDrive")+"&body="+encodeURIComponent("Started from the hub. Just press Create / Submit; the scan takes about 2 minutes, then reload the hub.");
+const rescanBtn=()=>`<a class="btn" href="${RESCAN}" target="_blank" rel="noopener" title="Re-reads sDrive › 02_Measurements (runs by itself every night; needs Tan's GitHub account)">↻ Rescan sDrive</a>`;
 function vSamples(){
   const L=S.samples.filter(s=>S.sf==="all"||s.project===S.sf).sort((a,b)=>(a.order||99)-(b.order||99));
-  return `<section class="ptitle"><div><h2>Samples<span class="cn">${S.samples.length}</span></h2><p>One card per die. Open a die to see its layout; click a device for its status and its measurement files on sDrive.</p></div>${addBtn("samples","Add a sample")}</section>
+  return `<section class="ptitle"><div><h2>Samples<span class="cn">${S.samples.length}</span></h2><p>One card per die. Open a die to see its layout; click a device for its status and its measurement files on sDrive.${DEV&&DEV.scanned?` File list from sDrive updated ${esc(fmtD(DEV.scanned))}; it refreshes every night.`:""}</p></div><div class="row">${rescanBtn()}${addBtn("samples","Add a sample")}</div></section>
   <div class="tools">${pjChips("sf")}</div>
   ${L.length?`<div class="dgrid">${L.map(s=>{const {c,t}=sampleCounts(s);const has=DEV&&DEV.maps[s._id];const nf=Object.keys((DEV&&DEV.files[s._id])||{}).length;
    return `<article class="card dcard">${editBtn("samples",s._id,s.name)}<a class="dlink" href="#die-${esc(s._id)}" aria-label="Open ${esc(s.name)}">
@@ -400,7 +403,7 @@ function vDie(){const sid=(location.hash.match(/^#die-(.+)$/)||[])[1];const s=S.
      ${g.rows.map(r=>{const ri=g.tr?((m.colInfo||{})[r]||""):((m.rowInfo||{})[r]||"");return `<div class="drh">${esc(r)}${ri?`<small>${esc(ri)}</small>`:""}</div>`+g.cols.map(cc=>{const cell=cellOf(m,g,r,cc);
        if(g.sub)return `<div class="dcell">${g.sub.map(j=>cell[j]?devBtn(sid,cell[j],sel,hl):`<span class="dnone"></span>`).join("")}</div>`;
        return cell._?devBtn(sid,cell._,sel,hl):`<span class="dnone"></span>`}).join("")}).join("")}</div></div>
-     <p class="note">${hasCfg?"Dots show the pillar arrangement in each cell (from the SEM layout); the number is the pillar count when above 4. ":""}${m.colUnit?`Column header: ${esc(m.colUnit)}. `:""}${g.tr?"Map shown rotated (series as rows) to fit the screen. ":""}${g.sub?"Each cell holds junctions J1 J2 / J3 J4. ":""}Files indexed from sDrive on ${esc(fmtD(DEV.scanned))}.</p>`}
+     <p class="note">${hasCfg?"Dots show the pillar arrangement in each cell (from the SEM layout); the number is the pillar count when above 4. ":""}${m.colUnit?`Column header: ${esc(m.colUnit)}. `:""}${g.tr?"Map shown rotated (series as rows) to fit the screen. ":""}${g.sub?"Each cell holds junctions J1 J2 / J3 J4. ":""}Files indexed from sDrive on ${esc(fmtD(DEV.scanned))} (refreshed every night, or ${`<a href="${RESCAN}" target="_blank" rel="noopener">rescan now ↗</a>`}).</p>`}
   return `${head}<div class="dwrap"><section class="dmain">${sbar(c,t)}${leg}${mapHTML}</section><aside class="dside" id="dside">${sel?devPanel(sid,sel):samplePanel(s)}</aside></div>`}
 function pillars(cfg,n,spc){cfg=String(cfg||"").toLowerCase();let sp=/far/.test(cfg)?0.85:/medium/.test(cfg)?0.6:0.42;if(spc)sp=0.3+0.6*Math.log(spc/150)/Math.log(2000/150);let P=[];
   const grid=(k,g)=>{const o=[];for(let i=0;i<k;i++)for(let j=0;j<k;j++)o.push([(i-(k-1)/2)*g,(j-(k-1)/2)*g]);return o};
