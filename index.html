@@ -54,7 +54,7 @@ nav.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}nav.tabs::-we
 .tab[aria-current="page"]{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(194,24,91,.35)}
 .tab .n{font:500 12px var(--mono);opacity:.75;margin-left:5px}
 .tab .sm{display:none}
-@media (max-width:600px){.tab .lg{display:none}.tab .sm{display:inline}nav.tabs{gap:0;margin:0 -10px}.tab{font-size:13.5px;padding:8px 10px}.tab .n{display:none}}
+@media (max-width:600px){.tab .lg{display:none}.tab .sm{display:inline}nav.tabs{gap:0;margin:0 -10px}.tab{font-size:13.5px;padding:8px 8px}.tab .n{display:none}}
 
 main .wrap{padding-block:26px 56px;display:grid;gap:30px}
 section{min-width:0}
@@ -209,6 +209,11 @@ ol.tl>li.flash{background:var(--accent-soft)}
 .tlc:hover{background:color-mix(in srgb,var(--c) 30%,#fff);color:var(--ink)}
 @media (max-width:600px){ol.tl>li{grid-template-columns:1fr;gap:6px}.tlrow{grid-template-columns:1fr;gap:3px}}
 
+.libnav{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px;box-shadow:var(--shadow);max-width:640px}
+.libnav a{display:grid;gap:1px;padding:10px 14px;border-radius:10px;text-decoration:none;color:var(--ink);font:700 16px var(--display)}
+.libnav a small{font:400 12.5px var(--body);color:var(--muted)}
+.libnav a:hover{background:var(--navy-soft);color:var(--ink)}
+.libnav a[aria-current="page"]{background:var(--navy);color:#fff}.libnav a[aria-current="page"] small{color:rgba(255,255,255,.75)}
 /* toolbars */
 .tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .chip{border:1px solid var(--line);background:var(--raised);color:var(--ink);border-radius:999px;padding:6px 13px;min-height:36px;font:500 13.5px var(--body);cursor:pointer}
@@ -287,9 +292,9 @@ footer.site{padding-block:0 32px;color:var(--muted);font-size:13.5px}
   <nav class="tabs" aria-label="Sections">
     <a class="tab" href="#overview" data-v="overview">Overview</a>
     <a class="tab" href="#samples" data-v="samples">Samples<span class="n" id="nS"></span></a>
+    <a class="tab" href="#timeline" data-v="timeline">Timeline</a>
     <a class="tab" href="#meetings" data-v="meetings"><span class="lg">Meetings & talks</span><span class="sm">Meetings</span><span class="n" id="nM"></span></a>
-    <a class="tab" href="#learn" data-v="learn">Learn</a>
-    <a class="tab" href="#papers" data-v="papers">Papers<span class="n" id="nP"></span></a>
+    <a class="tab" href="#learn" data-v="library">Library<span class="n" id="nP"></span></a>
   </nav>
 </div></div>
 
@@ -338,7 +343,7 @@ function merge(){if(!S.base)return;
 
 /* ---------- render ---------- */
 function render(){
-  const v=view();document.querySelectorAll(".tab").forEach(t=>{if(t.dataset.v===(v==="die"||v==="timeline"?"samples":v==="talks"?"meetings":v))t.setAttribute("aria-current","page");else t.removeAttribute("aria-current")});
+  const v=view();document.querySelectorAll(".tab").forEach(t=>{if(t.dataset.v===(v==="die"?"samples":v==="talks"?"meetings":v==="learn"||v==="papers"?"library":v))t.setAttribute("aria-current","page");else t.removeAttribute("aria-current")});
   $("#nS").textContent=S.samples.length||"";$("#nM").textContent=S.meetings.length||"";$("#nP").textContent=S.refs.length||"";
   const ch=$("#chatLink");if(drive("chat"))ch.href=drive("chat");const r=$("#driveRoot");if(drive("root")){r.href=drive("root");r.hidden=false}else r.hidden=true;
   const el=$("#view");if(!S.base){el.innerHTML=`<div class="empty">Loading…</div>`;return}
@@ -453,7 +458,7 @@ function vTimeline(){
     return `<li id="tl-${d}"><div class="tld"><b>${dt.getDate()} ${MON[dt.getMonth()]}</b><span>${WD[dt.getDay()]}</span></div><div class="tlb">${parts.join("")}</div></li>`};
   let list="",lastM="";for(const d of days){const m=d.slice(0,7);if(m!==lastM){list+=`${lastM?"</ol>":""}<h3 class="tlmh">${MON[+m.slice(5)-1]} ${m.slice(0,4)}</h3><ol class="tl">`;lastM=m}list+=dayHTML(d)}if(lastM)list+="</ol>";
   const nd=days.filter(d=>nDev(d)).length;
-  return `<section class="ptitle"><div><h2>Timeline</h2><p>What was measured on which day, from the files in sDrive › 02_Measurements (file-name date, else upload date), plus meetings, talks and device status changes.</p></div><a class="btn ghost" href="#samples">← Samples</a></section>
+  return `<section class="ptitle"><div><h2>Timeline</h2><p>What was measured on which day, from the files in sDrive › 02_Measurements (file-name date, else upload date), plus meetings, talks and device status changes.</p></div></section>
   <div class="tools">${chipB("tlf","all","All projects")}${Object.entries(PJ).map(([k,n])=>chipB("tlf",k,n)).join("")}</div>
   <div class="tools">${years.map(y=>`<button type="button" class="chip" data-f="tly" data-val="${y}" aria-pressed="${y===yr}">${y}</button>`).join("")}<span class="note">${nd} measurement day${nd===1?"":"s"} in ${yr}</span></div>
   ${heat}${days.length?list:`<div class="empty">Nothing recorded in ${yr} for this filter.</div>`}`}
@@ -461,7 +466,7 @@ document.addEventListener("click",e=>{const a=e.target.closest("[data-tlday]");i
 
 function vSamples(){
   const L=S.samples.filter(s=>S.sf==="all"||s.project===S.sf).sort((a,b)=>(a.order||99)-(b.order||99));
-  return `<section class="ptitle"><div><h2>Samples<span class="cn">${S.samples.length}</span></h2><p>One card per die. Open a die to see its layout; click a device for its status and its measurement files on sDrive.${DEV&&DEV.scanned?` File list from sDrive updated ${esc(fmtD(DEV.scanned))}; it refreshes every night.`:""}</p></div><div class="row"><a class="btn" href="#timeline">📅 Timeline</a>${rescanBtn()}${addBtn("samples","Add a sample")}</div></section>
+  return `<section class="ptitle"><div><h2>Samples<span class="cn">${S.samples.length}</span></h2><p>One card per die. Open a die to see its layout; click a device for its status and its measurement files on sDrive.${DEV&&DEV.scanned?` File list from sDrive updated ${esc(fmtD(DEV.scanned))}; it refreshes every night.`:""}</p></div><div class="row">${rescanBtn()}${addBtn("samples","Add a sample")}</div></section>
   <div class="tools">${pjChips("sf")}</div>
   ${L.length?`<div class="dgrid">${L.map(s=>{const {c,t}=sampleCounts(s);const has=DEV&&DEV.maps[s._id];const nf=Object.keys((DEV&&DEV.files[s._id])||{}).length;
    return `<article class="card dcard">${editBtn("samples",s._id,s.name)}<a class="dlink" href="#die-${esc(s._id)}" aria-label="Open ${esc(s.name)}">
@@ -583,8 +588,9 @@ function vFiles(){
 /* ---------- Learn & Papers (encrypted module) ---------- */
 let MOD=null,MODerr="";
 const HELP={esc,link,PJ,chipB,editBtn,addBtn,drive:k=>drive(k)};
-function vLearn(){return MOD?MOD.learn(S,S.lf):`<div class="empty">${MODerr||"Loading the Learn section…"}</div>`}
-function vPapers(){return MOD?MOD.papers(S,S.rf,S.rq):`<div class="empty">${MODerr||"Loading the reference library…"}</div>`}
+const libNav=v=>`<nav class="libnav" aria-label="Library"><a href="#learn"${v==="learn"?' aria-current="page"':""}>📖 Learn <small>physics behind the projects</small></a><a href="#papers"${v==="papers"?' aria-current="page"':""}>📄 Papers <small>${S.refs.length} references</small></a></nav>`;
+function vLearn(){return libNav("learn")+(MOD?MOD.learn(S,S.lf):`<div class="empty">${MODerr||"Loading the Learn section…"}</div>`)}
+function vPapers(){return libNav("papers")+(MOD?MOD.papers(S,S.rf,S.rq):`<div class="empty">${MODerr||"Loading the reference library…"}</div>`)}
 async function loadLearn(){try{const x=await fetch("learn.enc.json",{cache:"no-store"}).then(r=>r.json());const {js}=await decB(CR.k,x);
   MOD=new Function("H",js)(HELP);const st=document.createElement("style");st.textContent=MOD.css;document.head.appendChild(st);S.base.refs=MOD.refs;merge();render();
   if(location.hash.includes("-")){const t=document.getElementById(location.hash.slice(1));if(t)setTimeout(()=>t.scrollIntoView(),50)}}catch(e){MODerr="Could not load this section.";render()}}
