@@ -574,8 +574,11 @@ const FBV="10.12.2",FBU=m=>`https://www.gstatic.com/firebasejs/${FBV}/firebase-$
 const LV={on:false,err:"",updates:[],chat:[],items:{},fs:null,db:null};
 function ago(ms){if(!ms)return "";const s=(Date.now()-ms)/1000;if(s<60)return "just now";if(s<3600)return Math.floor(s/60)+" min ago";if(s<86400)return Math.floor(s/3600)+" h ago";const d=new Date(ms);return d.getDate()+" "+MON[d.getMonth()]+(d.getFullYear()!==new Date().getFullYear()?" "+d.getFullYear():"")}
 const tms=x=>x.t&&x.t.toMillis?x.t.toMillis():Date.now();
-async function startLive(pw){try{const [{initializeApp},{getAuth,signInWithEmailAndPassword},fs]=await Promise.all([import(FBU("app")),import(FBU("auth")),import(FBU("firestore"))]);
-  const app=initializeApp(FBC);await signInWithEmailAndPassword(getAuth(app),"hub@stnolaf.cloud",pw);LV.fs=fs;LV.db=fs.getFirestore(app);LV.on=true;LV.err="";
+async function startLive(pw,remember){try{const [{initializeApp},A,fs]=await Promise.all([import(FBU("app")),import(FBU("auth")),import(FBU("firestore"))]);
+  const app=initializeApp(FBC),auth=A.getAuth(app);LV.auth=auth;LV.A=A;
+  if(pw){await A.setPersistence(auth,remember?A.browserLocalPersistence:A.browserSessionPersistence);await A.signInWithEmailAndPassword(auth,"hub@stnolaf.cloud",pw)}
+  else{await auth.authStateReady();if(!auth.currentUser){lockOut();return}}
+  LV.fs=fs;LV.db=fs.getFirestore(app);LV.on=true;LV.err="";
   const sub=(col,n,key)=>fs.onSnapshot(fs.query(fs.collection(LV.db,col),fs.orderBy("t","desc"),fs.limit(n)),async snap=>{const out=[];for(const d of snap.docs){const x=d.data();try{out.push({id:d.id,t:tms(x),...(await decB(CR.k,x))})}catch(e){}}LV[key]=out;drawLive()},()=>{LV.err="offline";drawLive()});
   sub("updates",30,"updates");sub("chat",80,"chat");
   fs.onSnapshot(fs.collection(LV.db,"items"),async snap=>{const it={};for(const d of snap.docs){const x=d.data();try{it[d.id]={t:tms(x),...(await decB(CR.k,x))}}catch(e){}}LV.items=it;merge();render()},()=>{LV.err="offline";drawLive()});
@@ -600,18 +603,25 @@ async function deriveKey(pw,salt,it){const m=await crypto.subtle.importKey("raw"
 async function decB(k,b){return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:"AES-GCM",iv:ub(b.iv)},k,ub(b.ct))))}
 async function encB(k,o){const iv=crypto.getRandomValues(new Uint8Array(12));return {iv:eb(iv),ct:eb(await crypto.subtle.encrypt({name:"AES-GCM",iv},k,new TextEncoder().encode(JSON.stringify(o))))}}
 let ENC=null;
-async function unlock(pw,remember){const k=await deriveKey(pw,ENC.kdf.salt,ENC.kdf.iter);const d=await decB(k,ENC);
+/* the password itself is never stored: only a non-extractable AES key in IndexedDB (it cannot be read back, even with F12) */
+const KDB={open:()=>new Promise((res,rej)=>{const r=indexedDB.open("lafhub",1);r.onupgradeneeded=()=>r.result.createObjectStore("k");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}),
+  async op(mode,fn){const db=await KDB.open();return new Promise(res=>{const t=db.transaction("k",mode),q=fn(t.objectStore("k"));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>res(null)})},
+  get:()=>KDB.op("readonly",s=>s.get("key")).catch(()=>null),set:v=>KDB.op("readwrite",s=>s.put(v,"key")).catch(()=>null),del:()=>KDB.op("readwrite",s=>s.delete("key")).catch(()=>null)};
+async function unlock(pw,remember){const k=await deriveKey(pw,ENC.kdf.salt,ENC.kdf.iter);await openWith(k,pw,remember)}
+async function openWith(k,pw,remember){const d=await decB(k,ENC);
   for(const x of ENC.extra||[]){try{const m=await decB(k,x);d.meetings=(d.meetings||[]).filter(y=>y._id!==m._id).concat([m])}catch(e){}}
-  CR.k=k;if(remember){try{localStorage.setItem("lafhub_pw",pw)}catch(e){}}
+  CR.k=k;if(remember&&pw)await KDB.set({k,salt:ENC.kdf.salt});try{localStorage.removeItem("lafhub_pw")}catch(e){}
   S.base={projects:d.projects||[],samples:d.samples||[],runs:d.runs||[],meetings:d.meetings||[],talks:d.talks||[],refs:[]};S.config=d.config||{};merge();
-  document.body.classList.remove("locked");const L=$("#lock");if(L)L.remove();render();startLive(pw);loadLearn();loadDev()}
+  document.body.classList.remove("locked");const L=$("#lock");if(L)L.remove();render();startLive(pw,remember);loadLearn();loadDev()}
 function lockScreen(){document.body.classList.add("locked");const L=document.createElement("div");L.id="lock";L.innerHTML=`<form class="lbox" id="lf"><div class="lt">LAF STNO <span>Hub</span></div><p class="note" style="margin:0">This page is private. Enter the password.</p>
   <input type="password" id="lpw" autocomplete="current-password" placeholder="Password" aria-label="Password" required><label class="note lrem"><input type="checkbox" id="lrm" checked> Remember on this device</label>
   <button class="btn primary" type="submit">Open</button><div class="lerr" id="lerr" role="alert"></div></form>`;document.body.appendChild(L);
   $("#lf").onsubmit=async e=>{e.preventDefault();const b=e.target.querySelector("button");b.disabled=true;b.textContent="Opening…";try{await unlock($("#lpw").value,$("#lrm").checked)}catch(x){$("#lerr").textContent="Wrong password.";b.disabled=false;b.textContent="Open"}};setTimeout(()=>{const i=$("#lpw");if(i)i.focus()},50)}
-function lockOut(){try{localStorage.removeItem("lafhub_pw")}catch(e){}location.reload()}
+async function lockOut(){try{localStorage.removeItem("lafhub_pw")}catch(e){}await KDB.del();try{if(LV.auth)await LV.A.signOut(LV.auth)}catch(e){}location.reload()}
 render();
 fetch("data.enc.json",{cache:"no-store"}).then(r=>r.json()).then(async e=>{ENC=e;let pw="";try{pw=localStorage.getItem("lafhub_pw")||""}catch(x){}
-  if(pw){try{await unlock(pw,false);return}catch(x){try{localStorage.removeItem("lafhub_pw")}catch(y){}}}lockScreen()}).catch(()=>{$("#view").innerHTML='<div class="empty">Could not load the data.</div>'});
+  if(pw){try{localStorage.removeItem("lafhub_pw")}catch(y){}try{await unlock(pw,true);return}catch(x){}}/* one-time move from the old stored password */
+  const sk=await KDB.get();if(sk&&sk.k&&sk.salt===ENC.kdf.salt){try{await openWith(sk.k,null,true);return}catch(x){await KDB.del()}}
+  lockScreen()}).catch(()=>{$("#view").innerHTML='<div class="empty">Could not load the data.</div>'});
 </script>
 </body></html>
