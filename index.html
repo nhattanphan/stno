@@ -12,7 +12,7 @@
 :root{
   --bg:#e9edf6; --surface:#f7f8fc; --raised:#fff; --ink:#141a33; --muted:#4f5778; --faint:#737a99; --line:#d3d9ea; color-scheme:light;
   --navy:#1d2a6b; --navy-soft:#e3e8f8; --accent:#c2185b; --accent-soft:#fbe4ee;
-  --ok:#2e7d4f; --warn:#a8690f; --bad:#c0392b; --bad2:#7b1d1d; --vio:#6b4bb3; --idle:#b6bccf;
+  --ok:#2e7d4f; --warn:#a8690f; --bad:#c0392b; --bad2:#3b3f52; --vio:#6b4bb3; --open:#1b8aa6; --idle:#b6bccf;
   --display:"Archivo","IBM Plex Sans",system-ui,sans-serif; --body:"IBM Plex Sans",system-ui,-apple-system,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
   --r:12px; --shadow:0 1px 2px rgba(20,26,51,.05),0 4px 14px rgba(20,26,51,.05);
 }
@@ -184,6 +184,10 @@ dl.info dt{color:var(--muted);font-weight:600}dl.info dd{margin:0;min-width:0;ov
 .dform{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:12px}
 .dfl{display:grid;gap:4px;font:600 13px var(--body)}
 
+@media (max-width:600px){header .wrap{padding-block:10px;flex-wrap:nowrap;align-items:center}h1{font-size:22px}.who{display:none}.hbtns{flex-wrap:nowrap;gap:6px}.hbtns .btn{min-height:38px;padding:6px 10px}.hbtns .bl{display:none}}
+.tsec{border-top:1px solid var(--line);padding-top:26px;display:grid;gap:14px;scroll-margin-top:70px}
+.cline{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}.cline b{color:var(--ink)}
+.feed .ago{font:500 12.5px var(--mono)}
 /* toolbars */
 .tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .chip{border:1px solid var(--line);background:var(--raised);color:var(--ink);border-radius:999px;padding:6px 13px;min-height:36px;font:500 13.5px var(--body);cursor:pointer}
@@ -255,18 +259,16 @@ footer.site{padding-block:0 32px;color:var(--muted);font-size:13.5px}
       <h1>LAF STNO <span>Hub</span></h1>
       <div class="who">Nhat-Tan Phan · Vincent Cros · Romain Lebrun — Laboratoire Albert Fert · coupled spin-torque oscillators and MTJ rectification</div>
     </div>
-    <div class="hbtns"><a class="btn pink" id="chatLink" href="https://www.tchap.gouv.fr/" target="_blank" rel="noopener">💬 Tchap room ↗</a><a class="btn primary" id="driveRoot" href="#" target="_blank" rel="noopener">📁 sDrive folder ↗</a></div>
+    <div class="hbtns"><a class="btn" href="#files" aria-label="Files and folders">🗂 <span class="bl">Files</span></a><a class="btn pink" id="chatLink" href="https://www.tchap.gouv.fr/" target="_blank" rel="noopener" aria-label="Tchap room">💬 <span class="bl">Tchap room ↗</span></a><a class="btn primary" id="driveRoot" href="#" target="_blank" rel="noopener" aria-label="sDrive folder">📁 <span class="bl">sDrive ↗</span></a></div>
   </div>
 </header>
 <div class="tabbar"><div class="wrap">
   <nav class="tabs" aria-label="Sections">
     <a class="tab" href="#overview" data-v="overview">Overview</a>
     <a class="tab" href="#samples" data-v="samples">Samples<span class="n" id="nS"></span></a>
-    <a class="tab" href="#meetings" data-v="meetings">Meetings<span class="n" id="nM"></span></a>
-    <a class="tab" href="#talks" data-v="talks">Talks<span class="n" id="nT"></span></a>
+    <a class="tab" href="#meetings" data-v="meetings"><span class="lg">Meetings & talks</span><span class="sm">Meetings</span><span class="n" id="nM"></span></a>
     <a class="tab" href="#learn" data-v="learn">Learn</a>
     <a class="tab" href="#papers" data-v="papers">Papers<span class="n" id="nP"></span></a>
-    <a class="tab" href="#files" data-v="files">Files</a>
   </nav>
 </div></div>
 
@@ -282,7 +284,7 @@ footer.site{padding-block:0 32px;color:var(--muted);font-size:13.5px}
 
 <script>
 const PJ={ep:"EP encirclement",stvo:"STVO array",sd:"Spin-diode",floq:"Floquet"};
-const STC=[["alive","Alive","--ok"],["untested","Untested","--idle"],["suspect","Suspect","--warn"],["dead","Dead","--bad"],["measdead","Died in measurement","--bad2"],["short","Short","--vio"],["open","Open","--vio"]];
+const STC=[["alive","Alive","--ok"],["untested","Untested","--idle"],["suspect","Suspect","--warn"],["dead","Dead","--bad"],["measdead","Died in measurement","--bad2"],["short","Short","--vio"],["open","Open","--open"]];
 const MT={group:["Group meeting","--navy"],spincom:["SPINCOM","--accent"],collab:["Collaborators","--vio"],other:["Other","--muted"]};
 const TK={oral:["Oral talk","--navy"],invited:["Invited talk","--accent"],poster:["Poster","--vio"],seminar:["Seminar","--ok"]};
 const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -315,16 +317,17 @@ function merge(){if(!S.base)return;
 
 /* ---------- render ---------- */
 function render(){
-  const v=view();document.querySelectorAll(".tab").forEach(t=>{if(t.dataset.v===(v==="die"?"samples":v))t.setAttribute("aria-current","page");else t.removeAttribute("aria-current")});
-  $("#nS").textContent=S.samples.length||"";$("#nM").textContent=S.meetings.length||"";$("#nT").textContent=S.talks.length||"";$("#nP").textContent=S.refs.length||"";
+  const v=view();document.querySelectorAll(".tab").forEach(t=>{if(t.dataset.v===(v==="die"?"samples":v==="talks"?"meetings":v))t.setAttribute("aria-current","page");else t.removeAttribute("aria-current")});
+  $("#nS").textContent=S.samples.length||"";$("#nM").textContent=S.meetings.length||"";$("#nP").textContent=S.refs.length||"";
   const ch=$("#chatLink");if(drive("chat"))ch.href=drive("chat");const r=$("#driveRoot");if(drive("root")){r.href=drive("root");r.hidden=false}else r.hidden=true;
   const el=$("#view");if(!S.base){el.innerHTML=`<div class="empty">Loading…</div>`;return}
   const keep={};["chatIn","chatName","dvNote","dvSt"].forEach(id=>{const e=document.getElementById(id);if(e)keep[id]=e.value});
   const ae=document.activeElement&&el.contains(document.activeElement)&&document.activeElement.id,sel=ae&&document.activeElement.selectionStart;
-  el.innerHTML=({overview:vOverview,samples:vSamples,die:vDie,meetings:vMeetings,talks:vTalks,learn:vLearn,papers:vPapers,files:vFiles})[v]();
+  el.innerHTML=({overview:vOverview,samples:vSamples,die:vDie,meetings:vMeetings,talks:vMeetings,learn:vLearn,papers:vPapers,files:vFiles})[v]();
   if(MOD&&(v==="learn"||v==="papers"))try{MOD.mount(el)}catch(x){}
   for(const[id,val] of Object.entries(keep)){const e=document.getElementById(id);if(e)e.value=val}
   if(ae){const e=document.getElementById(ae);if(e){e.focus();try{if(sel!=null)e.setSelectionRange(sel,sel)}catch(x){}}}
+  if(v==="talks"){const t=document.getElementById("talks-sec");if(t)setTimeout(()=>t.scrollIntoView(),0)}
   drawLive()}
 
 function vOverview(){
@@ -332,15 +335,23 @@ function vOverview(){
   const alive=S.samples.reduce((n,s)=>n+((s.counts||{}).alive||0),0),tot=S.samples.reduce((n,s)=>n+(s.total||0),0);
   const R=[...S.runs].sort(byDate),M=[...S.meetings].sort(byDate),T=[...S.talks].sort(byDate);
   const tile=(href,k,v,d)=>`<a class="tile" href="${href}"><span class="k">${k}</span><span class="v">${v}</span><span class="d">${d}</span></a>`;
-  const act=[...R.map(r=>({d:r.date,c:"--accent",k:"Measurement",t:r.device,s:[PJ[r.project],r.params].filter(Boolean).join(" · "),u:r.file,h:"#samples"})),
-    ...M.map(m=>({d:m.date,c:"--navy",k:"Meeting",t:m.title,s:m.who||"",u:m.slides,h:"#meetings"})),
-    ...T.map(t=>({d:t.date,c:"--vio",k:(TK[t.kind]||[t.kind])[0],t:t.title,s:t.conf,u:t.files,h:"#talks"}))].sort((a,b)=>String(b.d).localeCompare(String(a.d))).slice(0,7);
+  const ev=[],TAG={meetings:["Meeting","--navy","#meetings"],talks:["Talk / poster","--vio","#talks"],refs:["Paper","--accent","#papers"],samples:["Sample","--ok","#samples"],projects:["Project","--accent","#overview"]};
+  const live=new Set();
+  for(const it of Object.values(LV.items)){if(!it||!it.t)continue;live.add(it.coll+"/"+it.id);
+    if(it.coll==="dev"){const i=it.id.indexOf("__"),sid=it.id.slice(0,i),n=it.id.slice(i+2),o=it.item||{},smp=S.samples.find(x=>x._id===sid);
+      ev.push({ms:it.t,c:STV[o.st]||"--idle",k:"Device",t:`${n} · ${smp?smp.name:sid} → ${STL[o.st]||o.st||"updated"}`,s:[o.note,it.by&&"by "+it.by].filter(Boolean).join(" · "),h:"#die-"+sid,dsel:sid+"|"+n});continue}
+    const L=TAG[it.coll];if(!L)continue;const o=it.item||{};ev.push({ms:it.t,c:L[1],k:it.del?L[0]+" removed":L[0],t:o.title||o.name||it.id,s:it.by?"by "+it.by:"",h:L[2],u:o.slides||o.files||o.url})}
+  M.forEach(m=>{if(!live.has("meetings/"+m._id))ev.push({ms:Date.parse(m.date+"T12:00"),c:"--navy",k:"Meeting",t:m.title,s:m.who||"",u:m.slides,h:"#meetings"})});
+  T.forEach(t=>{if(!live.has("talks/"+t._id))ev.push({ms:Date.parse(t.date+"T12:00"),c:"--vio",k:(TK[t.kind]||[t.kind])[0],t:t.title,s:t.conf,u:t.files,h:"#talks"})});
+  if(typeof DEV!=="undefined"&&DEV&&DEV.scanned&&DEV.files){const nd=Object.values(DEV.files).reduce((n,v)=>n+Object.keys(v).length,0);ev.push({ms:Date.parse(DEV.scanned+"T03:00"),c:"--idle",k:"sDrive",t:"Measurement file list refreshed",s:nd+" devices have measurement folders",h:"#samples"})}
+  const act=ev.filter(e=>isFinite(e.ms)&&e.ms<=Date.now()+864e5).sort((a,b)=>b.ms-a.ms).slice(0,8);
+  const when=ms=>Date.now()-ms<6*864e5?ago(ms):fmtD(new Date(ms-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10),1);
   return `<section id="overview-projects"><div class="shead"><h2>Projects</h2></div><div class="grid pgrid">${P.map(projCard).join("")}</div></section>
-  <section><div class="shead"><h2>Recent activity</h2></div>
-   ${act.length?`<ol class="feed">${act.map(a=>`<li><time>${fmtD(a.d,1)}</time><span class="dot" style="--c:var(${a.c})" aria-hidden="true"></span><div><div class="t"><a href="${a.h}">${esc(a.k)} · ${esc(a.t)}</a></div>${a.s?`<div class="s">${esc(a.s)}</div>`:""}</div>${a.u&&/^https?:/.test(a.u)?`<a class="btn sm" href="${esc(a.u)}" target="_blank" rel="noopener">Open ↗</a>`:"<span></span>"}</li>`).join("")}</ol>`:`<div class="empty">Nothing logged yet.</div>`}</section>
+  <section><div class="shead"><h2>What's new</h2><span class="note">device updates, meetings, talks, papers and sDrive files</span></div>
+   ${act.length?`<ol class="feed">${act.map(a=>`<li><time class="ago">${esc(when(a.ms))}</time><span class="dot" style="--c:var(${a.c})" aria-hidden="true"></span><div><div class="t"><a href="${a.h}"${a.dsel?` data-dsel="${esc(a.dsel)}"`:""}>${esc(a.k)} · ${esc(a.t)}</a></div>${a.s?`<div class="s">${esc(a.s)}</div>`:""}</div>${a.u&&/^https?:/.test(a.u)?`<a class="btn sm" href="${esc(a.u)}" target="_blank" rel="noopener">Open ↗</a>`:"<span></span>"}</li>`).join("")}</ol>`:`<div class="empty">Nothing new yet.</div>`}</section>
   <section class="help"><h3>How to use this hub</h3><ol>
    <li><b>Samples:</b> open a die to see its layout; click any device for its status and its measurement files on sDrive.</li>
-   <li><b>Add things</b> with the <b>＋</b> button on each tab (a meeting, a talk, a paper) and fix any card with <b>✎ Edit</b>; device status is changed from the die map.</li>
+   <li><b>Add things</b> with the <b>＋</b> button on each tab (a meeting or talk, a paper) and fix any card with <b>✎ Edit</b>; device status is changed from the die map.</li>
    <li><b>Files stay on sDrive.</b> Upload slides or data there, then paste the link (on sDrive: ⋯ next to the file › <i>Copy internal link</i>).</li>
   </ol></section>`}
 
@@ -357,7 +368,7 @@ function bar(c,t){const parts=STC.map(([k,,v])=>[k,c[k]||0,v]).filter(x=>x[1]);i
 /* ---------- Samples: die maps & devices ---------- */
 let DEV=null;
 const STL={alive:"Alive",untested:"Untested",suspect:"Suspect",dead:"Dead",measdead:"Died in measurement",short:"Short",open:"Open",skip:"Not used (C-state)"};
-const STV={alive:"--ok",untested:"--idle",suspect:"--warn",dead:"--bad",measdead:"--bad2",short:"--vio",open:"--vio",skip:"--skip"};
+const STV={alive:"--ok",untested:"--idle",suspect:"--warn",dead:"--bad",measdead:"--bad2",short:"--vio",open:"--open",skip:"--skip"};
 async function loadDev(){try{const x=await fetch("devices.enc.json",{cache:"no-store"}).then(r=>r.json());DEV=await decB(CR.k,x);
   try{const r=await fetch("scan.enc.json",{cache:"no-store"});if(r.ok){const sc=await decB(CR.k,await r.json());if(sc&&sc.files){DEV.files=sc.files;DEV.scanned=sc.scanned}}}catch(e){}render()}catch(e){DEV={maps:{},files:{},err:1};render()}}
 function devGet(sid,name){const m=DEV&&DEV.maps[sid];if(!m)return null;const b=m.dev[name];const it=LV.items["dev__"+sid+"__"+name];
@@ -378,6 +389,9 @@ function miniMap(sid){const m=DEV&&DEV.maps[sid];if(!m||m.list)return "";const g
     else{const n=cell._;if(!n)return;const d=devGet(sid,n);out+=`<rect x="${X}" y="${Y}" width="${cw}" height="${cw}" rx="1" fill="var(${STV[d.st]||"--idle"})"/>`}}));
   const W=g.cols.length*(cw+gap),Hh=g.rows.length*(ch+gap);return `<svg class="mini" viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${out}</svg>`}
 let rsT;window.addEventListener("resize",()=>{clearTimeout(rsT);rsT=setTimeout(()=>{if(view()==="die")render()},200)});
+function cardBar(c,t){if(!t)return "";const parts=STC.map(([k,,v])=>[k,c[k]||0,v]).filter(x=>x[1]);const un=c.untested||0;
+  return `<div class="bar" role="img" aria-label="${parts.map(([k,n])=>n+" "+k).join(", ")}">${parts.map(([k,n,v])=>`<i style="width:${n/t*100}%;background:var(${v})"></i>`).join("")}</div>
+  <div class="cline"><b>${c.alive||0}</b> alive · <b>${t-un}</b> tested · ${t} devices${c.dead||c.measdead?` · ${(c.dead||0)+(c.measdead||0)} dead`:""}</div>`}
 function sbar(c,t){return bar(c,t||1)}
 const RESCAN="https://github.com/nhattanphan/stno/issues/new?title="+encodeURIComponent("Rescan sDrive")+"&body="+encodeURIComponent("Started from the hub. Just press Create / Submit; the scan takes about 2 minutes, then reload the hub.");
 const rescanBtn=()=>`<a class="btn" href="${RESCAN}" target="_blank" rel="noopener" title="Re-reads sDrive › 02_Measurements (runs by itself every night; needs Tan's GitHub account)">↻ Rescan sDrive</a>`;
@@ -388,8 +402,8 @@ function vSamples(){
   ${L.length?`<div class="dgrid">${L.map(s=>{const {c,t}=sampleCounts(s);const has=DEV&&DEV.maps[s._id];const nf=Object.keys((DEV&&DEV.files[s._id])||{}).length;
    return `<article class="card dcard">${editBtn("samples",s._id,s.name)}<a class="dlink" href="#die-${esc(s._id)}" aria-label="Open ${esc(s.name)}">
    <div class="minibox">${has&&!has.list?miniMap(s._id):`<span class="note">${DEV?"no layout":"loading…"}</span>`}</div>
-   <div class="dtxt"><div class="row"><span class="pj">${esc(PJ[s.project]||s.project)}</span><span class="note">${t?t+" devices":"no device map"}${nf?` · ${nf} with data`:""}</span></div>
-   <h3>${esc(s.name)}</h3>${s.subtitle?`<div class="sub">${esc(s.subtitle)}</div>`:""}</div></a>${sbar(c,t)}</article>`}).join("")}</div>`:`<div class="empty">No samples for this project.</div>`}`}
+   <div class="dtxt"><div class="row"><span class="pj">${esc(PJ[s.project]||s.project)}</span><span class="note">${nf?`${nf} device${nf>1?"s":""} with data`:t?"":"no device map"}</span></div>
+   <h3>${esc(s.name)}</h3>${s.subtitle?`<div class="sub">${esc(s.subtitle)}</div>`:""}</div></a>${cardBar(c,t)}</article>`}).join("")}</div>`:`<div class="empty">No samples for this project.</div>`}`}
 
 function vDie(){const sid=(location.hash.match(/^#die-(.+)$/)||[])[1];const s=S.samples.find(x=>x._id===sid);
   if(!s)return `<div class="empty">Sample not found. <a href="#samples">Back to samples</a></div>`;
@@ -446,7 +460,7 @@ function devPanel(sid,n){const d=devGet(sid,n)||{st:"untested"};const st=d.st||"
    <label class="dfl">Note<textarea id="dvNote" rows="2" placeholder="e.g. R–H OK, died at 5 mA">${esc(d.note||"")}</textarea></label>
    ${myName()?"":`<label class="dfl">Your name<input id="dvName" maxlength="30" required></label>`}
    <button class="btn primary" type="submit">Save</button></form></div>`}
-document.addEventListener("click",e=>{const b=e.target.closest("[data-dev]");if(b){const sid=(location.hash.match(/^#die-(.+)$/)||[])[1];S.dsel=[sid,b.dataset.dev];render();
+document.addEventListener("click",e=>{const ds=e.target.closest("[data-dsel]");if(ds){S.dsel=ds.dataset.dsel.split("|");return}const b=e.target.closest("[data-dev]");if(b){const sid=(location.hash.match(/^#die-(.+)$/)||[])[1];S.dsel=[sid,b.dataset.dev];render();
     const sd=$("#dside");if(sd&&window.innerWidth<900)sd.scrollIntoView({behavior:"smooth",block:"start"});return}
   if(e.target.closest("[data-dclose]")){S.dsel=null;render();return}
   const h=e.target.closest("[data-hl]");if(h){S.dhl=S.dhl===h.dataset.hl?"":h.dataset.hl;render()}});
@@ -478,7 +492,8 @@ function vMeetings(){
   return `<section class="ptitle"><div><h2>Meetings<span class="cn">${all.length}</span></h2><p>Put the slides in ${link(drive("meet"),"sDrive › 03_Meetings ↗")||"sDrive › 03_Meetings"} (one folder per meeting, YYYY-MM-DD_type), then add the meeting here.</p></div>${addBtn("meetings","Add a meeting")}</section>
   <div class="tools">${chipB("mf","all","All",all.length)}${Object.keys(MT).filter(k=>cnt(k)).map(k=>chipB("mf",k,MT[k][0],cnt(k))).join("")}</div>
   <div class="tools">${chipB("my","all","All years")}${years.map(y=>chipB("my",y,y)).join("")}<input class="search" id="mq" type="search" placeholder="Search title, people, decisions…" value="${esc(S.mq)}" aria-label="Search meetings"></div>
-  ${L.length?Object.keys(by).sort().reverse().map(y=>`<section><h2 class="yh">${y} <span class="cn">${by[y].length}</span></h2><div class="mlist">${by[y].map(meetCard).join("")}</div></section>`).join(""):`<div class="empty">${all.length?"No meeting matches.":"No meetings logged yet."}</div>`}`}
+  ${L.length?Object.keys(by).sort().reverse().map(y=>`<section><h2 class="yh">${y} <span class="cn">${by[y].length}</span></h2><div class="mlist">${by[y].map(meetCard).join("")}</div></section>`).join(""):`<div class="empty">${all.length?"No meeting matches.":"No meetings logged yet."}</div>`}
+  <div id="talks-sec" class="tsec">${vTalks()}</div>`}
 
 function talkCard(t){const [y,mo]=String(t.date).split("-");const k=TK[t.kind]||[t.kind,"--muted"];
   return `<article class="mt"><div class="md"><b>${esc(MON[(+mo||1)-1])}</b><span>${esc(y)}</span></div>
