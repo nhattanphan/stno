@@ -1,4 +1,5 @@
-"""Scan sDrive › 02_Measurements through a read-only share link and write the encrypted
+"""Scan sDrive › 01_Samples (one folder per die, one sub-folder per device) and 02_Projects through a read-only share link
+(of the Tan_STNO_LAF root folder) and write the encrypted
 device→files index used by the hub (scan.enc.json). Runs in GitHub Actions.
 Secrets: SDRIVE_SHARE_URL (the share link), SDRIVE_SHARE_PASSWORD, HUB_PASSWORD."""
 import os, re, json, base64, hashlib, datetime, sys, email.utils, xml.etree.ElementTree as ET
@@ -45,17 +46,27 @@ def ls(path):
         except Exception: lmd = ""
         out.append({"p": rel, "id": int(fid.text) if fid is not None else 0, "dir": resp.find(".//d:collection", NS) is not None, "lm": lmd})
     return out
-tree, q = [], [""]
+# The share link may point at the hub root folder (Tan_STNO_LAF) or at 01_Samples / 02_Projects themselves.
+top = [x["p"] for x in ls("")]
+if any(t.rstrip("/") == "01_Samples" for t in top): roots = {"s": "01_Samples/", "p": "02_Projects/"}
+else: roots = {"s": "", "p": ""}
+tree, q = [], [roots["s"]] + ([roots["p"]] if roots["p"] else [])
+seen = set()
 while q:
-    for x in ls(q.pop(0)):
+    p = q.pop(0)
+    if p in seen: continue
+    seen.add(p)
+    for x in ls(p):
         tree.append(x)
         if x["dir"]: q.append(x["p"])
 print("entries:", len(tree))
+samples = [dict(x, p=x["p"][len(roots["s"]):]) for x in tree if x["p"].startswith(roots["s"]) and (not roots["p"] or not x["p"].startswith(roots["p"]))]
+proj = [dict(x, p=x["p"][len(roots["p"]):]) for x in tree if roots["p"] and x["p"].startswith(roots["p"])] or samples
 
-# --- device matching (same rules as the hub)
-MAP = {"VB01-23-EN": "vb-en", "VB01-23-DM": "vb-dm", "INL-VPW32-TJ7917_MaskD-CoFeSi-wedge": "inl-vpw32-tj7917", "INL-SMWEH08-TJ7377": "inl-smweh08-tj7377",
-       "SPINTEC-RFHR1111-D41": "spintec-rfhr1111-d41", "SPINTEC-AZ96-13-HI": "spintec-az96-13-hi", "INL-VPW43": "inl-vpw43", "SPINTEC-RFL693-D65": "spintec-rfl693-d65",
-       "INL-VPW41-TJ8929": "inl-vpw41-tj8929", "SPINTEC-AZ96-13-DI": "spintec-az96-13-di", "SPINTEC-RFL655-HG": "spintec-rfl655-hg"}
+# --- device matching (same rules as the hub): 01_Samples/<die>/<device folder>/...
+MAP = {"VB01-23-EN": "vb-en", "VB01-23-DM": "vb-dm", "INL-VPW32-TJ7917": "inl-vpw32-tj7917", "INL-SMWEH08-TJ7377": "inl-smweh08-tj7377",
+       "SPINTEC-RFHR1111-D41": "spintec-rfhr1111-d41", "SPINTEC-AZ96-13-HI": "spintec-az96-13-hi", "SPINTEC-AZ96-13-HM": "spintec-az96-13-hm", "INL-VPW43": "inl-vpw43",
+       "SPINTEC-RFL693-D65": "spintec-rfl693-d65", "INL-VPW41-TJ8929": "inl-vpw41-tj8929", "SPINTEC-AZ96-13-DI": "spintec-az96-13-di", "SPINTEC-RFL655-HG": "spintec-rfl655-hg"}
 def key(sid, n):
     m = re.search(r"(?:^|[^A-Z])([A-I])\s*([1-6])\s*_?\s*J\s*([1-4])", n, re.I)
     if m: return m.group(1).upper() + m.group(2) + "_J" + m.group(3)
@@ -72,35 +83,51 @@ def cat(p):
 def fdate(name, lm):
     m = re.search(r"(20[12]\d)[-_.]?(0[1-9]|1[0-2])[-_.]?(0[1-9]|[12]\d|3[01])", name)
     return f"{m.group(1)}-{m.group(2)}-{m.group(3)}" if m else lm
+nm = lambda p: p.rstrip("/").split("/")[-1]
 files, days, pdays = {}, {}, {}
 def addday(sid, k, d, n=1):
     if d: dd = days.setdefault(sid, {}).setdefault(k, {}); dd[d] = dd.get(d, 0) + n
-for d in [x for x in tree if x["dir"] and x["p"].startswith("Spin-diode/")]:
+def entry(sid, k, d, fs):
+    fs = [f for f in fs if not nm(f["p"]).startswith("~$")]
+    c, sl = [0, 0, 0, 0], []
+    for f in fs:
+        t = cat(f["p"]); c[t] += 1; addday(sid, k, fdate(nm(f["p"]), f["lm"]))
+        if t == 1: sl.append([nm(f["p"]), f["id"]])
+    e = {"n": "/".join(d["p"].rstrip("/").split("/")[1:]), "id": d["id"], "c": c}
+    if sl: e["sl"] = sl[:5]
+    files.setdefault(sid, {}).setdefault(k, []).append(e)
+for d in [x for x in samples if x["dir"]]:
     parts = d["p"].rstrip("/").split("/")
-    if len(parts) < 3: continue
-    sid = MAP.get(parts[1])
+    if len(parts) < 2: continue
+    sid = MAP.get(parts[0])
     if not sid: continue
     k = key(sid, parts[-1])
-    if not k or any(key(sid, a) == k for a in parts[2:-1]): continue
-    c, sl = [0, 0, 0, 0], []
-    for f in tree:
-        if not f["dir"] and f["p"].startswith(d["p"]):
-            t = cat(f["p"]); c[t] += 1; addday(sid, k, fdate(f["p"].split("/")[-1], f["lm"]))
-            if t == 1: sl.append([f["p"].split("/")[-1], f["id"]])
-    e = {"n": "/".join(parts[2:]), "id": d["id"], "c": c}
-    if sl: e["sl"] = sl[:8]
-    files.setdefault(sid, {}).setdefault(k, []).append(e)
-for f in tree:
-    if f["dir"] or not re.match(r"(STVO-array_Tristan|EP)/", f["p"]): continue
-    nm = f["p"].split("/")[-1]
-    m = re.search(r"_S([1-4])_((?:[A-O]\d{1,2}_?)+)", nm)
-    if m:
-        for dv in filter(None, m.group(2).split("_")):
-            files.setdefault("stvo-s" + m.group(1), {}).setdefault(dv, []).append({"n": nm, "id": f["id"], "file": 1, "c": [0, 1, 0, 0], "sl": [[nm, f["id"]]]})
-            addday("stvo-s" + m.group(1), dv, fdate(nm, f["lm"]))
-for f in tree:
+    if not k or any(key(sid, a) == k for a in parts[1:-1]): continue
+    entry(sid, k, d, [f for f in samples if not f["dir"] and f["p"].startswith(d["p"])])
+ST = "STVO-array_S1-S4/"
+dev_dirs = [x for x in samples if x["dir"] and re.match(r"^S[1-4]/[A-O]\d{1,2}/$", x["p"][len(ST):]) and x["p"].startswith(ST)]
+for d in dev_dirs:
+    s, dv = d["p"][len(ST):].split("/")[:2]
+    entry("stvo-s" + s[1], dv, d, [f for f in samples if not f["dir"] and f["p"].startswith(d["p"])])
+loose = {}
+for f in samples:
+    if f["dir"] or not f["p"].startswith(ST) or any(f["p"].startswith(d["p"]) for d in dev_dirs) or nm(f["p"]).startswith("~$"): continue
+    m = re.search(r"(?:^|_)S([1-4])_((?:[A-O]\d{1,2}_?)+)", nm(f["p"]))
+    if not m: continue
+    par = f["p"][:f["p"].rfind("/") + 1]
+    for dv in filter(None, m.group(2).split("_")):
+        loose.setdefault(("stvo-s" + m.group(1), dv, par), []).append(f)
+for (sid, dv, par), fs in loose.items():
+    if par == ST:
+        for f in fs:
+            files.setdefault(sid, {}).setdefault(dv, []).append({"n": nm(f["p"]), "id": f["id"], "file": 1, "c": [0, 1, 0, 0], "sl": [[nm(f["p"]), f["id"]]]})
+            addday(sid, dv, fdate(nm(f["p"]), f["lm"]))
+    else:
+        pd = next((x for x in samples if x["dir"] and x["p"] == par), {"p": par, "id": 0})
+        entry(sid, dv, pd, fs)
+for f in proj:
     if f["dir"] or not re.match(r"(Floquet|EP|EP-encirclement_PRB)/", f["p"]): continue
-    pj = "floq" if f["p"].startswith("Floquet") else "ep"; d = fdate(f["p"].split("/")[-1], f["lm"])
+    pj = "floq" if f["p"].startswith("Floquet") else "ep"; d = fdate(nm(f["p"]), f["lm"])
     if d: pdays.setdefault(pj, {})[d] = pdays.setdefault(pj, {}).get(d, 0) + 1
 
 # --- write only when something changed

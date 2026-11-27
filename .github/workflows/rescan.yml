@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -q requests cryptography
-      - name: Scan 02_Measurements
+      - name: Scan 01_Samples and 02_Projects
         env:
           SDRIVE_SHARE_URL: ${{ secrets.SDRIVE_SHARE_URL }}
           SDRIVE_SHARE_PASSWORD: ${{ secrets.SDRIVE_SHARE_PASSWORD }}

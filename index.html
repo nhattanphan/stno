@@ -445,7 +445,7 @@ function cardBar(c,t){if(!t)return "";const parts=STC.map(([k,,v])=>[k,c[k]||0,v
   <div class="cline"><b>${c.alive||0}</b> alive · <b>${t-un}</b> tested · ${t} devices${c.dead||c.measdead?` · ${(c.dead||0)+(c.measdead||0)} dead`:""}</div>`}
 function sbar(c,t){return bar(c,t||1)}
 const RESCAN="https://github.com/nhattanphan/stno/issues/new?title="+encodeURIComponent("Rescan sDrive")+"&body="+encodeURIComponent("Started from the hub. Just press Create / Submit; the scan takes about 2 minutes, then reload the hub.");
-const rescanBtn=()=>`<a class="btn" href="${RESCAN}" target="_blank" rel="noopener" title="Re-reads sDrive › 02_Measurements (runs by itself every night; needs Tan's GitHub account)">↻ Rescan sDrive</a>`;
+const rescanBtn=()=>`<a class="btn" href="${RESCAN}" target="_blank" rel="noopener" title="Re-reads sDrive › 01_Samples and 02_Projects (runs by itself every night; needs Tan's GitHub account)">↻ Rescan sDrive</a>`;
 /* ---------- Timeline: what was measured on which day ---------- */
 const isoOf=ms=>new Date(ms-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const WD=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -483,7 +483,7 @@ function vTimeline(){
     return `<li id="tl-${d}"><div class="tld"><b>${dt.getDate()} ${MON[dt.getMonth()]}</b><span>${WD[dt.getDay()]}</span></div><div class="tlb">${parts.join("")}</div></li>`};
   let list="",lastM="";for(const d of days){const m=d.slice(0,7);if(m!==lastM){list+=`${lastM?"</ol>":""}<h3 class="tlmh">${MON[+m.slice(5)-1]} ${m.slice(0,4)}</h3><ol class="tl">`;lastM=m}list+=dayHTML(d)}if(lastM)list+="</ol>";
   const nd=days.filter(d=>nDev(d)).length;
-  return `<section class="ptitle"><div><h2>Timeline</h2><p>What was measured on which day, from the files in sDrive › 02_Measurements (file-name date, else upload date), plus meetings, talks and device status changes.</p></div></section>
+  return `<section class="ptitle"><div><h2>Timeline</h2><p>What was measured on which day, from the files in sDrive › 01_Samples and 02_Projects (file-name date, else upload date), plus meetings, talks and device status changes.</p></div></section>
   <div class="tools">${chipB("tlf","all","All projects")}${Object.entries(PJ).map(([k,n])=>chipB("tlf",k,n)).join("")}</div>
   <div class="tools">${years.map(y=>`<button type="button" class="chip" data-f="tly" data-val="${y}" aria-pressed="${y===yr}">${y}</button>`).join("")}<span class="note">${nd} measurement day${nd===1?"":"s"} in ${yr}</span></div>
   ${heat}${days.length?list:`<div class="empty">Nothing recorded in ${yr} for this filter.</div>`}`}
@@ -549,7 +549,7 @@ function devPanel(sid,n){const d=devGet(sid,n)||{st:"untested"};const st=d.st||"
   ${d.note?`<p class="dnote">${esc(d.note)}</p>`:""}
   ${facts.length?`<dl class="info">${facts.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>`:""}
   <div><div class="lbl" style="margin-bottom:6px">On sDrive</div>${F.length?F.map(f=>`<div class="ffold"><a href="https://sdrive.cnrs.fr/f/${f.id}" target="_blank" rel="noopener"><b>${f.file?"📊":"📁"} ${esc(f.n)} ↗</b></a><span class="note">${f.file?"slides":typ(f.c)}</span>
-    ${(f.sl||[]).filter(x=>!f.file).map(([nm,id])=>`<a class="fslide" href="https://sdrive.cnrs.fr/f/${id}" target="_blank" rel="noopener">📊 ${esc(nm)}</a>`).join("")}</div>`).join(""):`<p class="note" style="margin:0">No measurement folder for this device (index of ${esc(fmtD(DEV.scanned))}). Name the folder after the device, e.g. <span class="mono">${esc(n)}</span>.</p>`}</div>
+    ${(f.sl||[]).filter(x=>!f.file).map(([nm,id])=>`<a class="fslide" href="https://sdrive.cnrs.fr/f/${id}" target="_blank" rel="noopener">📊 ${esc(nm)}</a>`).join("")}</div>`).join(""):`<p class="note" style="margin:0">No measurement folder for this device (index of ${esc(fmtD(DEV.scanned))}). Put a folder named after the device in the die folder under 01_Samples, e.g. <span class="mono">${esc(n)}</span>.</p>`}</div>
   <form class="dform" id="devForm" data-sid="${esc(sid)}" data-n="${esc(n)}"><div class="lbl">Update</div>
    <label class="dfl">Status<select id="dvSt">${Object.entries(STL).map(([k,l])=>`<option value="${k}"${k===st?" selected":""}>${esc(l)}</option>`).join("")}</select></label>
    <label class="dfl">Note<textarea id="dvNote" rows="2" placeholder="e.g. R–H OK, died at 5 mA">${esc(d.note||"")}</textarea></label>
@@ -672,7 +672,7 @@ function runRow(r){return `<div class="entry"><div class="d">${fmtD(r.date)}</di
   ${r.file?(/^https?:/.test(r.file)?`<div class="links">${link(r.file,"Open data ↗")}</div>`:`<div class="mono">${esc(r.file)}</div>`):""}${r._by?`<div class="note">edited by ${esc(r._by)}</div>`:""}</div></div>`}
 function vRuns(){
   const q=S.q.toLowerCase();const L=S.runs.filter(r=>(S.pf==="all"||r.project===S.pf)&&(!q||JSON.stringify(r).toLowerCase().includes(q))).sort(byDate);
-  return `<section class="ptitle"><div><h2>Measurements<span class="cn">${S.runs.length}</span></h2><p>Newest first. Raw files stay in sDrive › 02_Measurements; each entry links to its folder or slides.</p></div>${addBtn("runs","Log a measurement")}</section>
+  return `<section class="ptitle"><div><h2>Measurements<span class="cn">${S.runs.length}</span></h2><p>Newest first. Raw files stay in sDrive › 01_Samples (one folder per die and device); each entry links to its folder or slides.</p></div>${addBtn("runs","Log a measurement")}</section>
   <div class="tools">${pjChips("pf")}<input class="search" id="q" type="search" placeholder="Search device, result…" value="${esc(S.q)}" aria-label="Search measurements"></div>
   <div class="log">${L.length?L.map(runRow).join(""):`<div class="empty" style="border:0">No measurements match.</div>`}</div>`}
 
@@ -707,12 +707,12 @@ function vTalks(){
   ${L.length?Object.keys(by).sort().reverse().map(y=>`<section><h2 class="yh">${y} <span class="cn">${by[y].length}</span></h2><div class="mlist">${by[y].map(talkCard).join("")}</div></section>`).join(""):`<div class="empty">No talks or posters yet.</div>`}`}
 
 function vFiles(){
-  const F=[["root","Tan_STNO_LAF","Everything below"],["samples","01 · Samples","Sample info, layouts, die maps"],["meas","02 · Measurements","Raw data and quick-look plots, one folder per project"],["ep","EP encirclement","Gain maps, encirclement loops"],["stvo","STVO array","S1–S4 measurements"],["sd","Spin-diode","VB01-23 and SPINTEC/INL dies"],["floq","Floquet","Drive sweeps"],["meet","03 · Meetings","Slides, one folder per meeting"],["papers","04 · Papers","Drafts and figures"],["prb","PRB · Multi-turn EP","Figures and draft"],["code","05 · Code","Pointer to the Git repositories"],["conf","06 · Conferences","Talk slides and posters"],["refs","04 · References","Reference papers (PDF)"]];
+  const F=[["root","Tan_STNO_LAF","Everything below"],["samples","01 · Samples","One folder per die: _info (layout, stack) + one folder per device with its data and slides"],["meas","02 · Projects","EP, Floquet and PRB analyses, measurement log"],["ep","EP encirclement","Gain maps, encirclement loops"],["stvo","STVO array","S1–S4 info and measurements"],["floq","Floquet","Drive sweeps"],["meet","03 · Meetings","Slides, one folder per meeting"],["papers","04 · Papers","Drafts and figures"],["prb","PRB · Multi-turn EP","Figures and draft"],["code","05 · Code","Pointer to the Git repositories"],["conf","06 · Conferences","Talk slides and posters"],["refs","04 · References","Reference papers (PDF)"]];
   const OL=S.projects.filter(p=>p.overleaf);
   return `<section class="ptitle"><div><h2>Files</h2><p>Shortcuts to the shared sDrive folders (CNRS login) and the paper drafts.</p></div></section>
   ${OL.length?`<section><div class="shead"><h2>Paper writing</h2></div><div class="files">${OL.map(p=>`<a href="${esc(p.overleaf)}" target="_blank" rel="noopener"><b>Overleaf · ${esc(p.name)} ↗</b><span>${esc(p.title)}</span></a>`).join("")}</div></section>`:""}
   <section><div class="shead"><h2>sDrive folders</h2></div><div class="files">${F.filter(([k])=>drive(k)).map(([k,n,d])=>`<a href="${esc(drive(k))}" target="_blank" rel="noopener"><b>${esc(n)} ↗</b><span>${esc(d)}</span></a>`).join("")}</div>
-  <p class="note">Naming: measurement folders as <span class="mono">YYYY-MM-DD_sample_device_type</span> (e.g. <span class="mono">2026-11-20_S1_N5_RF</span>) with the raw file, the instrument settings and a quick-look .png.</p></section>`}
+  <p class="note">Where to put data: <span class="mono">01_Samples/&lt;die&gt;/&lt;device&gt;/</span> (e.g. <span class="mono">01_Samples/VB01-23-EN/G4J4/</span>), files named <span class="mono">YYYY-MM-DD_…</span> so the timeline picks up the date. A new device folder shows up on the die map after the next rescan.</p></section>`}
 
 /* ---------- Learn & Papers (encrypted module) ---------- */
 let MOD=null,MODerr="";
