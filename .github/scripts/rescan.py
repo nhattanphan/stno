@@ -125,9 +125,11 @@ for (sid, dv, par), fs in loose.items():
     else:
         pd = next((x for x in samples if x["dir"] and x["p"] == par), {"p": par, "id": 0})
         entry(sid, dv, pd, fs)
+projfiles = []
 for f in proj:
-    if f["dir"] or not re.match(r"(Floquet|EP|EP-encirclement_PRB)/", f["p"]): continue
-    pj = "floq" if f["p"].startswith("Floquet") else "ep"; d = fdate(nm(f["p"]), f["lm"])
+    if f["dir"] or nm(f["p"]).startswith("~$") or not re.match(r"(Floquet|EP|EP-encirclement_PRB|Spin-diode)/", f["p"]): continue
+    pj = "floq" if f["p"].startswith("Floquet") else "sd" if f["p"].startswith("Spin-diode") else "ep"; d = fdate(nm(f["p"]), f["lm"])
+    projfiles.append({"p": f["p"], "id": f["id"], "d": d})
     if d: pdays.setdefault(pj, {})[d] = pdays.setdefault(pj, {}).get(d, 0) + 1
 
 # --- write only when something changed
@@ -135,8 +137,8 @@ old = None
 if os.path.exists("scan.enc.json"):
     try: old = dec(json.load(open("scan.enc.json")))
     except Exception: pass
-if old and old.get("files") == files and old.get("days") == days and old.get("pdays") == pdays:
+if old and old.get("files") == files and old.get("days") == days and old.get("pdays") == pdays and old.get("proj") == projfiles:
     print("no change"); sys.exit(0)
-out = {"files": files, "days": days, "pdays": pdays, "scanned": datetime.date.today().isoformat(), "entries": len(tree)}
+out = {"files": files, "days": days, "pdays": pdays, "proj": projfiles, "scanned": datetime.date.today().isoformat(), "entries": len(tree)}
 json.dump(enc(out), open("scan.enc.json", "w"))
 print("updated:", sum(len(v) for v in files.values()), "devices with files")

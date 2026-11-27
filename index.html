@@ -48,7 +48,13 @@ h1 span{color:var(--accent)}
 /* tabs */
 .tabbar{position:sticky;top:0;z-index:20;background:var(--navy);box-shadow:0 4px 14px rgba(15,18,36,.22)}
 .tabbar .wrap{padding-block:8px}
-nav.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}nav.tabs::-webkit-scrollbar{display:none}
+.tabbar>.wrap{display:flex;align-items:center;gap:10px}
+nav.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+.modesw{display:flex;flex:none;background:rgba(255,255,255,.1);border-radius:9px;padding:3px;gap:2px}
+.modesw button{border:0;background:none;color:rgba(255,255,255,.78);font:600 12.5px var(--body);padding:6px 10px;border-radius:7px;cursor:pointer;min-height:32px}
+.modesw button[aria-pressed="true"]{background:#fff;color:var(--navy)}
+.modesw .sm{display:none}
+@media (max-width:600px){.modesw{background:none;padding:0}.modesw .lg{display:none}.modesw .sm{display:inline}.modesw button{padding:6px 8px;font-size:12px;background:rgba(255,255,255,.14);color:#fff}.modesw button[aria-pressed="true"]{display:none}.modesw button::before{content:"⇄ "}.tabbar>.wrap{gap:6px}}nav.tabs::-webkit-scrollbar{display:none}
 .tab{flex:none;color:rgba(255,255,255,.8);font:600 15px var(--body);padding:9px 16px;border-radius:999px;text-decoration:none;transition:background .15s,color .15s}
 .tab:hover{background:rgba(255,255,255,.13);color:#fff}
 .tab[aria-current="page"]{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(194,24,91,.35)}
@@ -149,6 +155,20 @@ dl.info dt{color:var(--muted);font-weight:600}dl.info dd{margin:0;min-width:0;ov
 .lchip b{width:10px;height:10px;border-radius:3px;display:inline-block}
 .lf{display:inline-flex;align-items:center;gap:6px;margin-left:6px}
 .fdot{width:8px;height:8px;border-radius:50%;background:#fff;border:2px solid var(--ink);display:inline-block}
+/* project pages */
+.phead{display:grid;gap:8px;margin-bottom:18px}.phead h2{margin:2px 0 0;font-size:26px;text-transform:none;letter-spacing:-.01em;color:var(--ink)}
+.pgrid2{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.pgrid2{grid-template-columns:minmax(0,1fr)}}
+.pcol{display:grid;gap:18px;min-width:0}
+.pcol .shead{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.pres{padding:10px 0;border-top:1px solid var(--line)}.pres:first-of-type{border-top:0}
+.pres h4{margin:0;font-size:15px}
+.pfl{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:2px}
+.pfl a{display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 8px;border-radius:8px;text-decoration:none;color:var(--ink)}
+.pfl a:hover{background:var(--navy-soft)}.pfn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13.5px}.pfd{font-size:12px;color:var(--muted);white-space:nowrap}
+.pempty{margin:6px 0 0}
+.pact{list-style:none;margin:0;padding:0;display:grid;gap:8px}.pact li{display:grid;grid-template-columns:86px minmax(0,1fr);gap:8px;font-size:13.5px;line-height:1.5}
+.pact .pad{color:var(--muted);font-weight:600;font-size:12.5px}
 /* stack & 3D pillar */
 .dseg{display:inline-flex;gap:4px;padding:4px;background:var(--raised);border:1px solid var(--line);border-radius:10px;justify-self:start}.dseg button{font:600 13.5px var(--body);border:0;background:none;color:var(--muted);padding:7px 14px;border-radius:7px;cursor:pointer;min-height:36px}.dseg button[aria-selected="true"]{background:var(--navy);color:#fff}
 
@@ -314,12 +334,13 @@ footer.site{padding-block:0 32px;color:var(--muted);font-size:13.5px}
 </header>
 <div class="tabbar"><div class="wrap">
   <nav class="tabs" aria-label="Sections">
-    <a class="tab" href="#overview" data-v="overview">Overview</a>
+    <a class="tab" href="#overview" data-v="overview"><span class="lg">Overview</span><span class="sm">Home</span></a>
     <a class="tab" href="#samples" data-v="samples">Samples<span class="n" id="nS"></span></a>
     <a class="tab" href="#timeline" data-v="timeline">Timeline</a>
     <a class="tab" href="#meetings" data-v="meetings"><span class="lg">Meetings & talks</span><span class="sm">Meetings</span><span class="n" id="nM"></span></a>
     <a class="tab" href="#learn" data-v="library">Library<span class="n" id="nP"></span></a>
   </nav>
+  <div class="modesw" role="group" aria-label="Arrange the hub"><button type="button" data-mode="type" aria-pressed="true"><span class="lg">By type</span><span class="sm">Type</span></button><button type="button" data-mode="project" aria-pressed="false"><span class="lg">By project</span><span class="sm">Project</span></button></div>
 </div></div>
 
 <main><div class="wrap" id="view" tabindex="-1"><div class="empty">Loading the hub…</div></div></main>
@@ -347,7 +368,7 @@ const today=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOStr
 const byDate=(a,b)=>String(b.date||"").localeCompare(String(a.date||""));
 function fmtD(s,noYear){const [y,m,d]=String(s||"").split("-");if(!m)return esc(s||"");return (+d?+d+" ":"")+MON[+m-1]+(noYear&&y==String(new Date().getFullYear())?"":" "+y)}
 function toast(t){const e=document.createElement("div");e.className="toast";e.setAttribute("role","status");e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2600)}
-function view(){const v=(location.hash||"#overview").slice(1).replace(/-.*/,"");return ["overview","samples","die","timeline","meetings","talks","learn","papers","files"].includes(v)?v:"overview"}
+function view(){const v=(location.hash||"#overview").slice(1).replace(/-.*/,"");return ["overview","samples","die","timeline","meetings","talks","learn","papers","files","p"].includes(v)?v:"overview"}
 function drive(k){return (S.config&&S.config[k])||""}
 function myName(){try{return localStorage.getItem("lafhub_name")||""}catch(e){return ""}}
 function setName(n){if(n)try{localStorage.setItem("lafhub_name",n)}catch(e){}}
@@ -367,13 +388,17 @@ function merge(){if(!S.base)return;
 
 /* ---------- render ---------- */
 function render(){
-  const v=view();document.querySelectorAll(".tab").forEach(t=>{if(t.dataset.v===(v==="die"?"samples":v==="talks"?"meetings":v==="learn"||v==="papers"?"library":v))t.setAttribute("aria-current","page");else t.removeAttribute("aria-current")});
-  $("#nS").textContent=S.samples.length||"";$("#nM").textContent=S.meetings.length||"";$("#nP").textContent=S.refs.length||"";
+  const v=view();const nav=$("nav.tabs"),sig=MODE+"|"+S.projects.map(p=>p.key).join(",");if(nav.dataset.sig!==sig){nav.innerHTML=navHTML();nav.dataset.sig=sig}
+  document.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.mode===MODE)));
+  let act=v==="die"?"samples":v==="talks"?"meetings":v==="learn"||v==="papers"?"library":v;if(v==="p")act="p-"+pkey();
+  if(MODE==="project"&&v==="die"){const s=S.samples.find(x=>x._id===(location.hash.match(/^#die-(.+)$/)||[])[1]);if(s)act="p-"+s.project}
+  document.querySelectorAll(".tab").forEach(t=>{if(t.dataset.v===act)t.setAttribute("aria-current","page");else t.removeAttribute("aria-current")});
+  const cnt=(id,n)=>{const e=document.getElementById(id);if(e)e.textContent=n||""};cnt("nS",S.samples.length);cnt("nM",S.meetings.length);cnt("nP",S.refs.length);
   const ch=$("#chatLink");if(drive("chat"))ch.href=drive("chat");const r=$("#driveRoot");if(drive("root")){r.href=drive("root");r.hidden=false}else r.hidden=true;
   const el=$("#view");if(!S.base){el.innerHTML=`<div class="empty">Loading…</div>`;return}
   const keep={};["chatIn","chatName","dvNote","dvSt"].forEach(id=>{const e=document.getElementById(id);if(e)keep[id]=e.value});
   const ae=document.activeElement&&el.contains(document.activeElement)&&document.activeElement.id,sel=ae&&document.activeElement.selectionStart;
-  el.innerHTML=({overview:vOverview,samples:vSamples,die:vDie,timeline:vTimeline,meetings:vMeetings,talks:vMeetings,learn:vLearn,papers:vPapers,files:vFiles})[v]();
+  el.innerHTML=({p:vProject,overview:vOverview,samples:vSamples,die:vDie,timeline:vTimeline,meetings:vMeetings,talks:vMeetings,learn:vLearn,papers:vPapers,files:vFiles})[v]();
   if(MOD&&(v==="learn"||v==="papers"))try{MOD.mount(el)}catch(x){}
   if(v==="die"&&DEV){const sid=(location.hash.match(/^#die-(.+)$/)||[])[1],s=S.samples.find(x=>x._id===sid);if(s&&stackOf(s))mountStack(s,sid,S.dsel&&S.dsel[0]===sid?S.dsel[1]:null)}
   for(const[id,val] of Object.entries(keep)){const e=document.getElementById(id);if(e)e.value=val}
@@ -411,7 +436,7 @@ function projCard(p){const sm=S.samples.filter(s=>s.project===p.key).length;
   <h3>${esc(p.name)}</h3><div class="sub">${esc(p.title)}</div><p>${esc(p.summary)}</p>
   ${p.facts&&p.facts.length?`<details><summary>Setup notes</summary><ul class="facts">${p.facts.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>`:""}
   ${p.overleaf?`<a class="btn" style="justify-self:start" href="${esc(p.overleaf)}" target="_blank" rel="noopener">✍️ Paper draft on Overleaf ↗</a>`:""}
-  <div class="links">${link(p.drive,"sDrive data ↗")}${p.paper?link(p.paper,"Paper folder ↗"):""}<a href="#samples" data-go="sf" data-val="${esc(p.key)}">Samples & devices</a></div></article>`}
+  <div class="links">${link(p.drive,"sDrive data ↗")}${p.paper?link(p.paper,"Paper folder ↗"):""}<a href="#samples" data-go="sf" data-val="${esc(p.key)}">Samples & devices</a></div><a class="btn primary sm" style="justify-self:start" href="#p-${esc(p.key)}">Open project page →</a></article>`}
 
 function bar(c,t){const parts=STC.map(([k,,v])=>[k,c[k]||0,v]).filter(x=>x[1]);if(!parts.length)return "";
   return `<div class="bar" role="img" aria-label="${parts.map(([k,n])=>n+" "+k).join(", ")}">${parts.map(([k,n,v])=>`<i style="width:${n/t*100}%;background:var(${v})"></i>`).join("")}</div>
@@ -421,7 +446,7 @@ let DEV=null;
 const STL={alive:"Alive",untested:"Untested",suspect:"Suspect",dead:"Dead",measdead:"Died in measurement",short:"Short",open:"Open",skip:"Not used (C-state)"};
 const STV={alive:"--ok",untested:"--idle",suspect:"--warn",dead:"--bad",measdead:"--bad2",short:"--vio",open:"--open",skip:"--skip"};
 async function loadDev(){try{const x=await fetch("devices.enc.json",{cache:"no-store"}).then(r=>r.json());DEV=await decB(CR.k,x);
-  try{const r=await fetch("scan.enc.json",{cache:"no-store"});if(r.ok){const sc=await decB(CR.k,await r.json());if(sc&&sc.files){DEV.files=sc.files;DEV.scanned=sc.scanned;if(sc.days)DEV.days=sc.days;if(sc.pdays)DEV.pdays=sc.pdays}}}catch(e){}render()}catch(e){DEV={maps:{},files:{},err:1};render()}}
+  try{const r=await fetch("scan.enc.json",{cache:"no-store"});if(r.ok){const sc=await decB(CR.k,await r.json());if(sc&&sc.files){DEV.files=sc.files;DEV.scanned=sc.scanned;if(sc.days)DEV.days=sc.days;if(sc.pdays)DEV.pdays=sc.pdays;if(sc.proj)DEV.proj=sc.proj}}}catch(e){}render()}catch(e){DEV={maps:{},files:{},err:1};render()}}
 function devGet(sid,name){const m=DEV&&DEV.maps[sid];if(!m)return null;const b=m.dev[name];const it=LV.items["dev__"+sid+"__"+name];
   if(!it||it.del)return b;return {...(b||{}),...it.item,_by:it.by,_t:it.t}}
 function devNames(sid){const m=DEV&&DEV.maps[sid];if(!m)return [];const n=new Set(Object.keys(m.dev));for(const k of Object.keys(LV.items))if(k.startsWith("dev__"+sid+"__"))n.add(k.slice(7+sid.length));return [...n]}
@@ -489,15 +514,16 @@ function vTimeline(){
   ${heat}${days.length?list:`<div class="empty">Nothing recorded in ${yr} for this filter.</div>`}`}
 document.addEventListener("click",e=>{const a=e.target.closest("[data-tlday]");if(!a)return;e.preventDefault();const t=document.getElementById("tl-"+a.dataset.tlday);if(t){t.scrollIntoView({behavior:"smooth",block:"start"});t.classList.add("flash");setTimeout(()=>t.classList.remove("flash"),1400)}else toast("Nothing recorded that day")});
 
+function sCard(s){const {c,t}=sampleCounts(s);const has=DEV&&DEV.maps[s._id];const nf=Object.keys((DEV&&DEV.files[s._id])||{}).length;
+   return `<article class="card dcard">${editBtn("samples",s._id,s.name)}<a class="dlink" href="#die-${esc(s._id)}" aria-label="Open ${esc(s.name)}">
+   <div class="minibox">${has&&!has.list?miniMap(s._id):`<span class="note">${DEV?"no layout":"loading…"}</span>`}</div>
+   <div class="dtxt"><div class="row"><span class="pj">${esc(PJ[s.project]||s.project)}</span><span class="note">${nf?`${nf} device${nf>1?"s":""} with data`:t?"":"no device map"}</span></div>
+   <h3>${esc(s.name)}</h3>${s.subtitle?`<div class="sub">${esc(s.subtitle)}</div>`:""}</div></a>${cardBar(c,t)}</article>`}
 function vSamples(){
   const L=S.samples.filter(s=>S.sf==="all"||s.project===S.sf).sort((a,b)=>(a.order||99)-(b.order||99));
   return `<section class="ptitle"><div><h2>Samples<span class="cn">${S.samples.length}</span></h2><p>One card per die. Open a die to see its layout; click a device for its status and its measurement files on sDrive.${DEV&&DEV.scanned?` File list from sDrive updated ${esc(fmtD(DEV.scanned))}; it refreshes every night.`:""}</p></div><div class="row">${rescanBtn()}${addBtn("samples","Add a sample")}</div></section>
   <div class="tools">${pjChips("sf")}</div>
-  ${L.length?`<div class="dgrid">${L.map(s=>{const {c,t}=sampleCounts(s);const has=DEV&&DEV.maps[s._id];const nf=Object.keys((DEV&&DEV.files[s._id])||{}).length;
-   return `<article class="card dcard">${editBtn("samples",s._id,s.name)}<a class="dlink" href="#die-${esc(s._id)}" aria-label="Open ${esc(s.name)}">
-   <div class="minibox">${has&&!has.list?miniMap(s._id):`<span class="note">${DEV?"no layout":"loading…"}</span>`}</div>
-   <div class="dtxt"><div class="row"><span class="pj">${esc(PJ[s.project]||s.project)}</span><span class="note">${nf?`${nf} device${nf>1?"s":""} with data`:t?"":"no device map"}</span></div>
-   <h3>${esc(s.name)}</h3>${s.subtitle?`<div class="sub">${esc(s.subtitle)}</div>`:""}</div></a>${cardBar(c,t)}</article>`}).join("")}</div>`:`<div class="empty">No samples for this project.</div>`}`}
+  ${L.length?`<div class="dgrid">${L.map(sCard).join("")}</div>`:`<div class="empty">No samples for this project.</div>`}`}
 
 function vDie(){const sid=(location.hash.match(/^#die-(.+)$/)||[])[1];const s=S.samples.find(x=>x._id===sid);
   if(!s)return `<div class="empty">Sample not found. <a href="#samples">Back to samples</a></div>`;
@@ -714,6 +740,52 @@ function vFiles(){
   <section><div class="shead"><h2>sDrive folders</h2></div><div class="files">${F.filter(([k])=>drive(k)).map(([k,n,d])=>`<a href="${esc(drive(k))}" target="_blank" rel="noopener"><b>${esc(n)} ↗</b><span>${esc(d)}</span></a>`).join("")}</div>
   <p class="note">Where to put data: <span class="mono">01_Samples/&lt;die&gt;/&lt;device&gt;/</span> (e.g. <span class="mono">01_Samples/VB01-23-EN/G4J4/</span>), files named <span class="mono">YYYY-MM-DD_…</span> so the timeline picks up the date. A new device folder shows up on the die map after the next rescan.</p></section>`}
 
+/* ---------- arrange by project ---------- */
+let MODE=(()=>{try{return localStorage.getItem("lafhub_mode")==="project"?"project":"type"}catch(e){return "type"}})();
+const PSH={ep:"EP",floq:"Floquet",stvo:"STVO",sd:"Diode"};
+const pkey=()=>(location.hash.match(/^#p-([^-]+)/)||[])[1]||"";
+function navHTML(){const lib=`<a class="tab" href="#learn" data-v="library">Library<span class="n" id="nP"></span></a>`;
+  if(MODE==="project"){const P=[...S.projects].sort((a,b)=>(a.order||9)-(b.order||9));
+    return `<a class="tab" href="#overview" data-v="overview"><span class="lg">Overview</span><span class="sm">Home</span></a>${P.map(p=>`<a class="tab" href="#p-${esc(p.key)}" data-v="p-${esc(p.key)}"><span class="lg">${esc(PJ[p.key]||p.name)}</span><span class="sm">${esc(PSH[p.key]||p.key)}</span></a>`).join("")}${lib}`}
+  return `<a class="tab" href="#overview" data-v="overview"><span class="lg">Overview</span><span class="sm">Home</span></a><a class="tab" href="#samples" data-v="samples">Samples<span class="n" id="nS"></span></a><a class="tab" href="#timeline" data-v="timeline">Timeline</a><a class="tab" href="#meetings" data-v="meetings"><span class="lg">Meetings & talks</span><span class="sm">Meetings</span><span class="n" id="nM"></span></a>${lib}`}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-mode]");if(!b)return;MODE=b.dataset.mode;try{localStorage.setItem("lafhub_mode",MODE)}catch(x){}
+  if(MODE==="project"&&/^#(samples|timeline|meetings|talks)?$/.test(location.hash)&&location.hash!==""){const f=[...S.projects].sort((a,b)=>(a.order||9)-(b.order||9))[0];if(f){location.hash="#p-"+f.key;return}}
+  render()});
+const MKW={ep:/\bEP\b|exceptional|encircl|claudio|salvatore|\bgains?\b|PRB/i,floq:/floquet/i,stvo:/STVO|tristan|vortex array|\barray\b/i,sd:/diode|rectif|harvest|VB01|ursula/i};
+const meetText=m=>[m.title,m.who,m.notes,m.decisions,m.actions,m.type,m.project].filter(Boolean).join(" ");
+const inProj=(m,k)=>m.project===k||(MKW[k]&&MKW[k].test(meetText(m)));
+const RES={ep:[["Gain maps","EP/Gain-maps/","gain","EP gain vs. frequency / current maps"],["EP loops","EP/EP-loops/","eploop","Encirclement loops, one file per loop"],["PRB analyses","EP-encirclement_PRB/","ep","Figures and analyses for the paper"],["Other EP files","EP/","",""]],
+  floq:[["Floquet results","Floquet/","floq","Drive sweeps and maps"]],sd:[["Summary slides","Spin-diode/","sdp","Cross-die comparisons"]]};
+const fdateC=n=>{const m=String(n).match(/(20[12]\d)[-_.]?(0[1-9]|1[0-2])[-_.]?(0[1-9]|[12]\d|3[01])/);return m?`${m[1]}-${m[2]}-${m[3]}`:""};
+const ficon=n=>/\.(pptx?|pdf)$/i.test(n)?"📑":/\.(png|jpe?g|gif|svg|tiff?)$/i.test(n)?"🖼":/\.(nc|csv|txt|dat|h5|npy|xlsx?|mat|json)$/i.test(n)?"📈":"📄";
+function projResults(k){const G=RES[k];if(!G)return "";const F=((DEV&&DEV.proj)||[]).filter(f=>!/^~\$/.test(f.p.split("/").pop()));const used=new Set();
+  const out=G.map(([title,pre,ck,desc])=>{const L=F.filter(f=>f.p.startsWith(pre)&&!used.has(f.id));L.forEach(f=>used.add(f.id));
+    if(!L.length&&!ck)return "";const fl=drive(ck);
+    const rows=L.map(f=>({f,n:f.p.split("/").pop(),d:fdateC(f.p)||f.d||""})).sort((a,b)=>b.d.localeCompare(a.d));
+    return `<div class="pres"><div class="row" style="justify-content:space-between"><h4>${esc(title)} <span class="cn">${L.length}</span></h4>${fl?`<a class="note" href="${esc(fl)}" target="_blank" rel="noopener">Open folder ↗</a>`:""}</div>
+     ${rows.length?`<ul class="pfl">${rows.slice(0,10).map(({f,n,d})=>`<li><a href="https://sdrive.cnrs.fr/f/${f.id}" target="_blank" rel="noopener"><span aria-hidden="true">${ficon(n)}</span><span class="pfn">${esc(n)}</span><span class="pfd">${d?esc(fmtD(d,1)):""}</span></a></li>`).join("")}</ul>${rows.length>10?`<p class="note">+ ${rows.length-10} more in the folder</p>`:""}`
+     :`<p class="note pempty">Nothing yet${desc?" — "+esc(desc):""}. Save files in <span class="mono">02_Projects/${esc(pre)}</span> with the date first in the name; they appear here after the next rescan.</p>`}</div>`}).join("");
+  return `<section class="panel"><div class="shead"><h2>Results</h2></div>${out}${DEV&&DEV.proj?"":`<p class="note">File list not scanned yet.</p>`}</section>`}
+function projActivity(k){const D=tlEvents(),days=Object.keys(D).sort().reverse();const rows=[];
+  for(const d of days){const E=D[d].filter(e=>e.p===k||(e.k==="meet"&&inProj(e.m,k))||(e.k==="proj"&&e.p===k));if(!E.length)continue;
+    const bits=[];const dv=E.filter(e=>e.k==="dev");if(dv.length)bits.push(dv.map(e=>`<a href="#die-${esc(e.sid)}" data-dsel="${esc(e.sid+"|"+e.n)}" class="tlc">${esc(e.n)}</a>`).join(" "));
+    E.filter(e=>e.k==="proj").forEach(e=>bits.push(`${e.c} project file${e.c>1?"s":""}`));
+    E.filter(e=>e.k==="meet").forEach(e=>bits.push("🗓 "+esc(e.m.title)));E.filter(e=>e.k==="talk").forEach(e=>bits.push("🎤 "+esc(e.t.title)));
+    E.filter(e=>e.k==="st").forEach(e=>bits.push(`${esc(e.n)} → ${esc(STL[e.st]||e.st)}`));
+    rows.push(`<li><span class="pad">${esc(fmtD(d,1))}</span><span>${bits.join(" · ")}</span></li>`);if(rows.length>=8)break}
+  return `<section class="panel"><div class="shead"><h2>Recent activity</h2><a class="note" href="#timeline" data-go="tlf" data-val="${esc(k)}">Full timeline →</a></div>${rows.length?`<ul class="pact">${rows.join("")}</ul>`:`<p class="note">No dated activity yet.</p>`}</section>`}
+function vProject(){const k=pkey(),p=S.projects.find(x=>x.key===k);if(!p)return `<div class="empty">Unknown project. <a href="#overview">Back to overview</a></div>`;
+  const smp=S.samples.filter(s=>s.project===k||(p.samples||[]).includes(s._id)).sort((a,b)=>(a.order||99)-(b.order||99));
+  const M=S.meetings.filter(m=>inProj(m,k)).sort(byDate),T=S.talks.filter(t=>t.project===k).sort(byDate);
+  return `<section class="phead card">${editBtn("projects",p._id,p.name)}<div class="row"><span class="pill">${esc(p.stage)}</span><span class="note">${smp.length} sample${smp.length===1?"":"s"}</span></div>
+   <h2>${esc(p.name)}</h2><div class="sub">${esc(p.title)}</div><p>${esc(p.summary)}</p>
+   ${p.facts&&p.facts.length?`<details><summary>Setup notes</summary><ul class="facts">${p.facts.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>`:""}
+   <div class="row">${p.overleaf?`<a class="btn primary sm" href="${esc(p.overleaf)}" target="_blank" rel="noopener">✍️ Overleaf draft ↗</a>`:""}${p.drive?`<a class="btn sm" href="${esc(p.drive)}" target="_blank" rel="noopener">📁 sDrive folder ↗</a>`:""}${p.paper?`<a class="btn sm" href="${esc(p.paper)}" target="_blank" rel="noopener">Paper folder ↗</a>`:""}</div></section>
+   <div class="pgrid2"><div class="pcol">${projResults(k)}
+    <section><div class="shead"><h2>Samples <span class="cn">${smp.length}</span></h2></div>${smp.length?`<div class="dgrid">${smp.map(sCard).join("")}</div>`:`<div class="empty">No samples linked to this project.</div>`}</section></div>
+   <div class="pcol">${projActivity(k)}
+    <section class="panel"><div class="shead"><h2>Meetings <span class="cn">${M.length}</span></h2><a class="note" href="#meetings">All meetings →</a></div>${M.length?`<div class="mlist">${M.slice(0,4).map(meetCard).join("")}</div>`:`<p class="note">No meeting mentions this project yet.</p>`}</section>
+    ${T.length?`<section class="panel"><div class="shead"><h2>Talks & posters <span class="cn">${T.length}</span></h2></div><div class="mlist">${T.slice(0,4).map(talkCard).join("")}</div></section>`:""}</div></div>`}
 /* ---------- Learn & Papers (encrypted module) ---------- */
 let MOD=null,MODerr="";
 const HELP={esc,link,PJ,chipB,editBtn,addBtn,drive:k=>drive(k)};
