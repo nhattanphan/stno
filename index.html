@@ -151,21 +151,21 @@ dl.info dt{color:var(--muted);font-weight:600}dl.info dd{margin:0;min-width:0;ov
 .fdot{width:8px;height:8px;border-radius:50%;background:#fff;border:2px solid var(--ink);display:inline-block}
 /* stack & 3D pillar */
 .stk{display:grid;gap:12px}
-.stkgrid{display:grid;gap:16px;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start}
+.stkgrid{display:grid;gap:16px;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:stretch}
 @media (max-width:760px){.stkgrid{grid-template-columns:minmax(0,1fr)}}
-.stk3d{position:relative;height:380px;border-radius:12px;background:radial-gradient(120% 90% at 50% 20%,#fff,#eef1f8);border:1px solid var(--line);overflow:hidden}
+.stk3d{position:relative;min-height:380px;height:100%;border-radius:12px;background:radial-gradient(120% 90% at 50% 20%,#fff,#eef1f8);border:1px solid var(--line);overflow:hidden}
 .stkcv{width:100%;height:100%;display:block;cursor:grab;touch-action:none}
 .stkcv:active{cursor:grabbing}
 .stkload{position:absolute;inset:0;display:grid;place-items:center;padding:16px;text-align:center}
 .stkcap{position:absolute;left:8px;bottom:8px;max-width:calc(100% - 16px);background:rgba(255,255,255,.85);padding:3px 8px;border-radius:6px;font:500 12px var(--body);color:var(--muted);pointer-events:none}
 .stktip{position:absolute;left:10px;top:10px;background:var(--ink);color:#fff;font:600 12px var(--body);padding:5px 9px;border-radius:7px;pointer-events:none;max-width:calc(100% - 20px)}
-.stkt{display:grid;gap:8px;min-width:0}
-.lys{list-style:none;margin:0;padding:0;display:grid;gap:2px;max-height:330px;overflow:auto}
-.ly{display:grid;grid-template-columns:12px minmax(0,1fr) auto;column-gap:9px;align-items:center;padding:5px 8px;border-radius:7px;cursor:default;outline:none}
-.ly i{width:12px;height:12px;border-radius:3px;grid-row:span 2;border:1px solid rgba(0,0,0,.12)}
+.stkt{display:grid;gap:8px;min-width:0;align-content:start}
+.lys{list-style:none;margin:0;padding:0;display:grid;gap:1px}
+.ly{display:grid;grid-template-columns:12px minmax(0,1fr) auto;column-gap:9px;align-items:center;padding:3px 8px;border-radius:7px;cursor:default;outline:none}
+.ly i{width:12px;height:12px;border-radius:3px;border:1px solid rgba(0,0,0,.12)}
 .ly .lm{font:600 13px var(--body);color:var(--ink);overflow-wrap:anywhere}
 .ly .lt{font-size:12px;color:var(--ink);text-align:right}
-.ly .lr{grid-column:2 / 4;font-size:11.5px;color:var(--faint)}
+.ly .lr{display:none}
 .ly.on,.ly:hover,.ly:focus-visible{background:var(--navy-soft)}
 .ly .tg{font:600 10.5px var(--body);color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:0 5px;white-space:nowrap}
 .rleg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11.5px;color:var(--muted)}
@@ -603,7 +603,7 @@ function stackSec(s,sid,sel){const st=stackOf(s);
   const L=st.layers,C=stackColors(L);const d=sel&&devGet(sid,sel);const Ø=stkDiam(sid,sel);const n=d&&d.cfg?pillarPts(d.cfg,d.n,+d.sp||0).length:1;
   const tot=L.reduce((a,l)=>a+(l.nom?0:l.t),0);
   const cap=[sel?`<b>${esc(sel)}</b>`:"Typical pillar",Ø?`Ø ${Ø} nm`:"",n>1?`${n} pillars · ${esc(d.cfg)}${d.sp?` · spacing ${d.sp} nm`:""}`:""].filter(Boolean).join(" · ");
-  const rows=L.map((l,i)=>({l,i})).reverse().map(({l,i})=>`<li class="ly" data-ly="${i}" tabindex="0"><i style="background:${C[i]}"></i><span class="lm">${esc(l.m)}${l.wedge?` <span class="tg">wedge${l.tr?" "+esc(l.tr):""}</span>`:""}${l.ra?` <span class="tg">RA ${esc(l.ra)}</span>`:""}</span><span class="lt mono">${l.nom?"—":esc(String(l.t))+" nm"}</span><span class="lr">${esc(ROLE[l.r][0])}</span></li>`).join("");
+  const rows=L.map((l,i)=>({l,i})).reverse().map(({l,i})=>`<li class="ly" data-ly="${i}" tabindex="0" title="${esc(ROLE[l.r][0])}"><i style="background:${C[i]}"></i><span class="lm">${esc(l.m)}${l.wedge?` <span class="tg">wedge${l.tr?" "+esc(l.tr):""}</span>`:""}${l.ra?` <span class="tg">RA ${esc(l.ra)}</span>`:""}</span><span class="lt mono">${l.nom?"—":esc(String(l.t))+" nm"}</span><span class="lr">${esc(ROLE[l.r][0])}</span></li>`).join("");
   const roles=[...new Set(L.map(l=>l.r))];
   return `<section class="panel stk" id="stk"><div class="row" style="justify-content:space-between;gap:8px"><h3>Stack &amp; pillar</h3><div class="row" style="gap:6px"><button type="button" class="btn ghost sm" data-stkx aria-pressed="${!!S.stkx}">${S.stkx?"Collapse layers":"Explode layers"}</button><button type="button" class="btn ghost sm" data-stkr>Reset view</button></div></div>
    ${st.assumed?`<p class="note warnn">${esc(st.assumed)}</p>`:""}
