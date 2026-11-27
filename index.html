@@ -163,6 +163,7 @@ dl.info dt{color:var(--muted);font-weight:600}dl.info dd{margin:0;min-width:0;ov
 .pcol .shead{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .pres{padding:10px 0;border-top:1px solid var(--line)}.pres:first-of-type{border-top:0}
 .pres h4{margin:0;font-size:15px}
+.libnav.pnav{margin:0 0 16px;grid-template-columns:repeat(3,minmax(0,1fr));max-width:820px}@media (max-width:600px){.pnav small{display:none}}
 .pfl{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:2px}
 .pfl a{display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 8px;border-radius:8px;text-decoration:none;color:var(--ink)}
 .pfl a:hover{background:var(--navy-soft)}.pfn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13.5px}.pfd{font-size:12px;color:var(--muted);white-space:nowrap}
@@ -399,7 +400,7 @@ function render(){
   const keep={};["chatIn","chatName","dvNote","dvSt"].forEach(id=>{const e=document.getElementById(id);if(e)keep[id]=e.value});
   const ae=document.activeElement&&el.contains(document.activeElement)&&document.activeElement.id,sel=ae&&document.activeElement.selectionStart;
   el.innerHTML=({p:vProject,overview:vOverview,samples:vSamples,die:vDie,timeline:vTimeline,meetings:vMeetings,talks:vMeetings,learn:vLearn,papers:vPapers,files:vFiles})[v]();
-  if(MOD&&(v==="learn"||v==="papers"))try{MOD.mount(el)}catch(x){}
+  if(MOD&&(v==="learn"||v==="papers"||(v==="p"&&psub())))try{MOD.mount(el)}catch(x){}
   if(v==="die"&&DEV){const sid=(location.hash.match(/^#die-(.+)$/)||[])[1],s=S.samples.find(x=>x._id===sid);if(s&&stackOf(s))mountStack(s,sid,S.dsel&&S.dsel[0]===sid?S.dsel[1]:null)}
   for(const[id,val] of Object.entries(keep)){const e=document.getElementById(id);if(e)e.value=val}
   if(ae){const e=document.getElementById(ae);if(e){e.focus();try{if(sel!=null)e.setSelectionRange(sel,sel)}catch(x){}}}
@@ -741,12 +742,13 @@ function vFiles(){
   <p class="note">Where to put data: <span class="mono">01_Samples/&lt;die&gt;/&lt;device&gt;/</span> (e.g. <span class="mono">01_Samples/VB01-23-EN/G4J4/</span>), files named <span class="mono">YYYY-MM-DD_…</span> so the timeline picks up the date. A new device folder shows up on the die map after the next rescan.</p></section>`}
 
 /* ---------- arrange by project ---------- */
+document.addEventListener("click",e=>{const j=e.target.closest("[data-jump]");if(!j)return;const t=document.getElementById(j.dataset.jump);if(t&&j.getAttribute("href").startsWith("#learn-")){e.preventDefault();t.scrollIntoView({behavior:"smooth"})}else if(t){setTimeout(()=>{const u=document.getElementById(j.dataset.jump);if(u)u.scrollIntoView()},60)}else{const id=j.dataset.jump;setTimeout(()=>{const u=document.getElementById(id);if(u)u.scrollIntoView()},120)}});
 let MODE=(()=>{try{return localStorage.getItem("lafhub_mode")==="project"?"project":"type"}catch(e){return "type"}})();
 const PSH={ep:"EP",floq:"Floquet",stvo:"STVO",sd:"Diode"};
 const pkey=()=>(location.hash.match(/^#p-([^-]+)/)||[])[1]||"";
 function navHTML(){const lib=`<a class="tab" href="#learn" data-v="library">Library<span class="n" id="nP"></span></a>`;
   if(MODE==="project"){const P=[...S.projects].sort((a,b)=>(a.order||9)-(b.order||9));
-    return `<a class="tab" href="#overview" data-v="overview"><span class="lg">Overview</span><span class="sm">Home</span></a>${P.map(p=>`<a class="tab" href="#p-${esc(p.key)}" data-v="p-${esc(p.key)}"><span class="lg">${esc(PJ[p.key]||p.name)}</span><span class="sm">${esc(PSH[p.key]||p.key)}</span></a>`).join("")}${lib}`}
+    return `<a class="tab" href="#overview" data-v="overview"><span class="lg">Overview</span><span class="sm">Home</span></a>${P.map(p=>`<a class="tab" href="#p-${esc(p.key)}" data-v="p-${esc(p.key)}"><span class="lg">${esc(PJ[p.key]||p.name)}</span><span class="sm">${esc(PSH[p.key]||p.key)}</span></a>`).join("")}`}
   return `<a class="tab" href="#overview" data-v="overview"><span class="lg">Overview</span><span class="sm">Home</span></a><a class="tab" href="#samples" data-v="samples">Samples<span class="n" id="nS"></span></a><a class="tab" href="#timeline" data-v="timeline">Timeline</a><a class="tab" href="#meetings" data-v="meetings"><span class="lg">Meetings & talks</span><span class="sm">Meetings</span><span class="n" id="nM"></span></a>${lib}`}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-mode]");if(!b)return;MODE=b.dataset.mode;try{localStorage.setItem("lafhub_mode",MODE)}catch(x){}
   if(MODE==="project"&&/^#(samples|timeline|meetings|talks)?$/.test(location.hash)&&location.hash!==""){const f=[...S.projects].sort((a,b)=>(a.order||9)-(b.order||9))[0];if(f){location.hash="#p-"+f.key;return}}
@@ -774,10 +776,16 @@ function projActivity(k){const D=tlEvents(),days=Object.keys(D).sort().reverse()
     E.filter(e=>e.k==="st").forEach(e=>bits.push(`${esc(e.n)} → ${esc(STL[e.st]||e.st)}`));
     rows.push(`<li><span class="pad">${esc(fmtD(d,1))}</span><span>${bits.join(" · ")}</span></li>`);if(rows.length>=8)break}
   return `<section class="panel"><div class="shead"><h2>Recent activity</h2><a class="note" href="#timeline" data-go="tlf" data-val="${esc(k)}">Full timeline →</a></div>${rows.length?`<ul class="pact">${rows.join("")}</ul>`:`<p class="note">No dated activity yet.</p>`}</section>`}
+const psub=()=>(location.hash.match(/^#p-[^-]+-(learn|papers)/)||[])[1]||"";
+function pNav(k,sub){const nL=MOD&&MOD.topics?MOD.topics.filter(t=>t.p.includes(k)).length:0,nP=S.refs.filter(r=>r.project===k).length;
+  return `<nav class="libnav pnav" aria-label="Project sections"><a href="#p-${k}"${!sub?' aria-current="page"':""}>📊 Project <small>results, samples, activity</small></a><a href="#p-${k}-learn"${sub==="learn"?' aria-current="page"':""}>📖 Learn <small>${nL} topic${nL===1?"":"s"}</small></a><a href="#p-${k}-papers"${sub==="papers"?' aria-current="page"':""}>📄 Papers <small>${nP} reference${nP===1?"":"s"}</small></a></nav>`}
 function vProject(){const k=pkey(),p=S.projects.find(x=>x.key===k);if(!p)return `<div class="empty">Unknown project. <a href="#overview">Back to overview</a></div>`;
+  const sub=psub();if(sub){const head=`<section class="ptitle"><div><h2>${esc(p.name)}</h2><p>${sub==="learn"?"The physics behind this project, with interactive figures.":"Reference papers for this project, with their main ideas. PDFs stay on sDrive."}</p></div></section>${pNav(k,sub)}`;
+    if(!MOD)return head+`<div class="empty">${MODerr?esc(MODerr):"Loading the library…"}</div>`;
+    return head+(sub==="learn"?MOD.learn(S,k,"p-"+k):MOD.papers(S,k,S.rq,"p-"+k))}
   const smp=S.samples.filter(s=>s.project===k||(p.samples||[]).includes(s._id)).sort((a,b)=>(a.order||99)-(b.order||99));
   const M=S.meetings.filter(m=>inProj(m,k)).sort(byDate),T=S.talks.filter(t=>t.project===k).sort(byDate);
-  return `<section class="phead card">${editBtn("projects",p._id,p.name)}<div class="row"><span class="pill">${esc(p.stage)}</span><span class="note">${smp.length} sample${smp.length===1?"":"s"}</span></div>
+  return `${pNav(k,"")}<section class="phead card">${editBtn("projects",p._id,p.name)}<div class="row"><span class="pill">${esc(p.stage)}</span><span class="note">${smp.length} sample${smp.length===1?"":"s"}</span></div>
    <h2>${esc(p.name)}</h2><div class="sub">${esc(p.title)}</div><p>${esc(p.summary)}</p>
    ${p.facts&&p.facts.length?`<details><summary>Setup notes</summary><ul class="facts">${p.facts.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>`:""}
    <div class="row">${p.overleaf?`<a class="btn primary sm" href="${esc(p.overleaf)}" target="_blank" rel="noopener">✍️ Overleaf draft ↗</a>`:""}${p.drive?`<a class="btn sm" href="${esc(p.drive)}" target="_blank" rel="noopener">📁 sDrive folder ↗</a>`:""}${p.paper?`<a class="btn sm" href="${esc(p.paper)}" target="_blank" rel="noopener">Paper folder ↗</a>`:""}</div></section>
