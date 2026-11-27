@@ -150,6 +150,8 @@ dl.info dt{color:var(--muted);font-weight:600}dl.info dd{margin:0;min-width:0;ov
 .lf{display:inline-flex;align-items:center;gap:6px;margin-left:6px}
 .fdot{width:8px;height:8px;border-radius:50%;background:#fff;border:2px solid var(--ink);display:inline-block}
 /* stack & 3D pillar */
+.dseg{display:inline-flex;gap:4px;padding:4px;background:var(--raised);border:1px solid var(--line);border-radius:10px;justify-self:start}.dseg button{font:600 13.5px var(--body);border:0;background:none;color:var(--muted);padding:7px 14px;border-radius:7px;cursor:pointer;min-height:36px}.dseg button[aria-selected="true"]{background:var(--navy);color:#fff}
+
 .stk{display:grid;gap:12px}
 .stkgrid{display:grid;gap:16px;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:stretch}
 @media (max-width:760px){.stkgrid{grid-template-columns:minmax(0,1fr)}}
@@ -161,7 +163,7 @@ dl.info dt{color:var(--muted);font-weight:600}dl.info dd{margin:0;min-width:0;ov
 .stktip{position:absolute;left:10px;top:10px;background:var(--ink);color:#fff;font:600 12px var(--body);padding:5px 9px;border-radius:7px;pointer-events:none;max-width:calc(100% - 20px)}
 .stkt{display:grid;gap:8px;min-width:0;align-content:start}
 .lys{list-style:none;margin:0;padding:0;display:grid;gap:1px}
-.ly{display:grid;grid-template-columns:12px minmax(0,1fr) auto;column-gap:9px;align-items:center;padding:3px 8px;border-radius:7px;cursor:default;outline:none}
+.ly{display:grid;grid-template-columns:12px minmax(0,1fr) auto;column-gap:9px;align-items:center;padding:2px 8px;border-radius:7px;cursor:default;outline:none}
 .ly i{width:12px;height:12px;border-radius:3px;border:1px solid rgba(0,0,0,.12)}
 .ly .lm{font:600 13px var(--body);color:var(--ink);overflow-wrap:anywhere}
 .ly .lt{font-size:12px;color:var(--ink);text-align:right}
@@ -512,8 +514,8 @@ function vDie(){const sid=(location.hash.match(/^#die-(.+)$/)||[])[1];const s=S.
        if(g.sub){const rs=rowSubs(m,g,r);return `<div class="dcell" style="grid-template-columns:repeat(${rs.length||1},1fr)">${rs.map(j=>cell[j]?devBtn(sid,cell[j],sel,hl):`<span class="dnone"></span>`).join("")}</div>`}
        return cell._?devBtn(sid,cell._,sel,hl):`<span class="dnone"></span>`}).join("")}).join("")}</div></div>
      <p class="note">${hasCfg?"Dots show the pillar arrangement in each cell (from the SEM layout); the number is the pillar count when above 4. ":""}${m.colUnit?`Column header: ${esc(m.colUnit)}. `:""}${g.tr?"Map shown rotated (series as rows) to fit the screen. ":""}${g.sub?"Each cell shows its junctions left to right (J1 J2 J3 J4; rows A–D have J1 J2 only). ":""}Files indexed from sDrive on ${esc(fmtD(DEV.scanned))} (refreshed every night, or ${`<a href="${RESCAN}" target="_blank" rel="noopener">rescan now ↗</a>`}).</p>`}
-  mapHTML+=stackSec(s,sid,sel);
-  return `${head}<div class="dwrap"><section class="dmain">${sbar(c,t)}${leg}${mapHTML}</section><aside class="dside" id="dside">${sel?devPanel(sid,sel):samplePanel(s)}</aside></div>`}
+  const stk=S.dmode==="stack";const sw=`<div class="seg dseg" role="tablist" aria-label="Die view"><button type="button" role="tab" data-dmode="map" aria-selected="${!stk}">🗺 Die map</button><button type="button" role="tab" data-dmode="stack" aria-selected="${stk}">🧱 Stack &amp; pillar${sel?` · ${esc(sel)}`:""}</button></div>`;
+  return `${head}<div class="dwrap"><section class="dmain">${sw}${stk?stackSec(s,sid,sel):sbar(c,t)+leg+mapHTML}</section><aside class="dside" id="dside">${sel?devPanel(sid,sel):samplePanel(s)}</aside></div>`}
 function pillars(cfg,n,spc){cfg=String(cfg||"").toLowerCase();let sp=/far/.test(cfg)?0.85:/medium/.test(cfg)?0.6:0.42;if(spc)sp=0.3+0.6*Math.log(spc/150)/Math.log(2000/150);let P=[];
   const grid=(k,g)=>{const o=[];for(let i=0;i<k;i++)for(let j=0;j<k;j++)o.push([(i-(k-1)/2)*g,(j-(k-1)/2)*g]);return o};
   const ring=(k,r,c)=>{const o=c?[[0,0]]:[];for(let i=0;i<k;i++){const a=-Math.PI/2+i*2*Math.PI/k;o.push([r*Math.cos(a),r*Math.sin(a)])}return o};
@@ -542,7 +544,7 @@ function devPanel(sid,n){const d=devGet(sid,n)||{st:"untested"};const st=d.st||"
    ["TMR",d.tmr!=null?d.tmr+" %":""],["R_min",d.rmin!=null?d.rmin+" Ω":""],["R–H class",d.cls2||""],["θ0",d.th!=null?d.th+"°":""],["μ0M_eff",d.meff!=null?d.meff+" mT":""],
    ["Configuration",[d.cfg,d.n&&d.n+" pillar"+(d.n>1?"s":"")].filter(Boolean).join(" · ")],["Spacing",d.sp?d.sp+" nm":""],["Priority",d.pri||""]].filter(x=>x[1]);
   const typ=([dd,ss,ii])=>[dd&&dd+" data",ss&&ss+" slides",ii&&ii+" images"].filter(Boolean).join(" · ")||"empty folder";
-  return `<div class="panel dpanel"><div class="row" style="justify-content:space-between"><h3>${esc(n)}</h3><button type="button" class="btn ghost sm" data-dclose aria-label="Close device">✕</button></div>
+  return `<div class="panel dpanel"><div class="row" style="justify-content:space-between"><h3>${esc(n)}</h3><div class="row" style="gap:6px">${S.dmode!=="stack"&&stackOf(S.samples.find(x=>x._id===sid)||{})?`<button type="button" class="btn ghost sm" data-dmode="stack">🧱 3D</button>`:""}<button type="button" class="btn ghost sm" data-dclose aria-label="Close device">✕</button></div></div>
   <div><span class="spill" style="--c:var(${STV[st]||"--idle"})">${esc(STL[st]||st)}</span>${d._by?` <span class="note">updated by ${esc(d._by)}${d._t?" · "+esc(ago(d._t)):""}</span>`:""}</div>
   ${d.note?`<p class="dnote">${esc(d.note)}</p>`:""}
   ${facts.length?`<dl class="info">${facts.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>`:""}
@@ -605,7 +607,7 @@ function stackSec(s,sid,sel){const st=stackOf(s);
   const cap=[sel?`<b>${esc(sel)}</b>`:"Typical pillar",Ø?`Ø ${Ø} nm`:"",n>1?`${n} pillars · ${esc(d.cfg)}${d.sp?` · spacing ${d.sp} nm`:""}`:""].filter(Boolean).join(" · ");
   const rows=L.map((l,i)=>({l,i})).reverse().map(({l,i})=>`<li class="ly" data-ly="${i}" tabindex="0" title="${esc(ROLE[l.r][0])}"><i style="background:${C[i]}"></i><span class="lm">${esc(l.m)}${l.wedge?` <span class="tg">wedge${l.tr?" "+esc(l.tr):""}</span>`:""}${l.ra?` <span class="tg">RA ${esc(l.ra)}</span>`:""}</span><span class="lt mono">${l.nom?"—":esc(String(l.t))+" nm"}</span><span class="lr">${esc(ROLE[l.r][0])}</span></li>`).join("");
   const roles=[...new Set(L.map(l=>l.r))];
-  return `<section class="panel stk" id="stk"><div class="row" style="justify-content:space-between;gap:8px"><h3>Stack &amp; pillar</h3><div class="row" style="gap:6px"><button type="button" class="btn ghost sm" data-stkx aria-pressed="${!!S.stkx}">${S.stkx?"Collapse layers":"Explode layers"}</button><button type="button" class="btn ghost sm" data-stkr>Reset view</button></div></div>
+  return `<section class="panel stk" id="stk"><div class="row" style="justify-content:space-between;gap:8px"><span class="note">${esc(s.subtitle||"")}</span><div class="row" style="gap:6px"><button type="button" class="btn ghost sm" data-stkx aria-pressed="${!!S.stkx}">${S.stkx?"Collapse layers":"Explode layers"}</button><button type="button" class="btn ghost sm" data-stkr>Reset view</button></div></div>
    ${st.assumed?`<p class="note warnn">${esc(st.assumed)}</p>`:""}
    <div class="stkgrid"><div class="stk3d" id="stkHost" data-key="${esc(sid+"|"+(sel||"")+"|"+Ø+"|"+n)}"><div class="stkload note">Loading 3D view…</div><div class="stktip" id="stkTip" hidden></div><div class="stkcap">${cap}</div></div>
    <div class="stkt"><div class="lbl">Layers · top → bottom${tot?` · ${+tot.toFixed(2)} nm recorded`:""}</div><ol class="lys">${rows}</ol>
@@ -649,7 +651,7 @@ async function mountStack(s,sid,sel){const host=$("#stkHost");if(!host)return;co
   const api={explode(on){exT=on?1:0},reset(){th=0.7;ph=1.15;exT=0;S.stkx=false;STK.view=null},hi,dispose(){cancelAnimationFrame(raf);geos.forEach(g=>g.dispose());mats.forEach(m=>m.dispose());sub.geometry.dispose();sub.material.dispose();ren.dispose();if(STK.canvas===cv){STK.canvas=null;STK.api=null;STK.key=null}}};
   host.prepend(cv);const ld=host.querySelector(".stkload");if(ld)ld.remove();STK.canvas=cv;STK.api=api;STK.key=key;bindStk();loop()}
 function bindStk(){document.querySelectorAll(".ly").forEach(r=>{const i=+r.dataset.ly;r.onmouseenter=r.onfocus=()=>STK.api&&STK.api.hi(i);r.onmouseleave=r.onblur=()=>STK.api&&STK.api.hi(-1)})}
-document.addEventListener("click",e=>{if(e.target.closest("[data-stkx]")){S.stkx=!S.stkx;render();return}if(e.target.closest("[data-stkr]")){if(STK.api)STK.api.reset();render()}});
+document.addEventListener("click",e=>{const dm=e.target.closest("[data-dmode]");if(dm){S.dmode=dm.dataset.dmode;render();return}if(e.target.closest("[data-stkx]")){S.stkx=!S.stkx;render();return}if(e.target.closest("[data-stkr]")){if(STK.api)STK.api.reset();render()}});
 document.addEventListener("click",e=>{const ds=e.target.closest("[data-dsel]");if(ds){S.dsel=ds.dataset.dsel.split("|");return}const b=e.target.closest("[data-dev]");if(b){const sid=(location.hash.match(/^#die-(.+)$/)||[])[1];S.dsel=[sid,b.dataset.dev];render();
     const sd=$("#dside");if(sd&&window.innerWidth<900)sd.scrollIntoView({behavior:"smooth",block:"start"});return}
   if(e.target.closest("[data-dclose]")){S.dsel=null;render();return}
