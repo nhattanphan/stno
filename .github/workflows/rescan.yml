@@ -1,7 +1,5 @@
 name: Rescan sDrive
 on:
-  schedule:
-    - cron: "17 2 * * *"
   workflow_dispatch:
   issues:
     types: [opened]
