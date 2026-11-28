@@ -471,7 +471,7 @@ function cardBar(c,t){if(!t)return "";const parts=STC.map(([k,,v])=>[k,c[k]||0,v
   <div class="cline"><b>${c.alive||0}</b> alive · <b>${t-un}</b> tested · ${t} devices${c.dead||c.measdead?` · ${(c.dead||0)+(c.measdead||0)} dead`:""}</div>`}
 function sbar(c,t){return bar(c,t||1)}
 const RESCAN="https://github.com/nhattanphan/stno/issues/new?title="+encodeURIComponent("Rescan sDrive")+"&body="+encodeURIComponent("Started from the hub. Just press Create / Submit; the scan takes about 2 minutes, then reload the hub.");
-const rescanBtn=()=>`<a class="btn" href="${RESCAN}" target="_blank" rel="noopener" title="Re-reads sDrive › 01_Samples and 02_Projects (runs by itself every night; needs Tan's GitHub account)">↻ Rescan sDrive</a>`;
+const rescanBtn=()=>`<a class="btn" href="${RESCAN}" target="_blank" rel="noopener" title="Re-reads sDrive › 01_Samples and 02_Projects (needs Tan's GitHub account)">↻ Rescan sDrive</a>`;
 /* ---------- Timeline: what was measured on which day ---------- */
 const isoOf=ms=>new Date(ms-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const WD=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
